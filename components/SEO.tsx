@@ -118,19 +118,9 @@ export const BlogSEO = ({
     }
   })
 
-  let authorList
-  if (authorDetails) {
-    authorList = authorDetails.map((author) => {
-      return {
-        '@type': 'Person',
-        name: author.name,
-      }
-    })
-  } else {
-    authorList = {
-      '@type': 'Person',
-      name: siteMetadata.author,
-    }
+  const authorList = authorDetails?.map(({ name }) => ({ '@type': 'Person', name })) ?? {
+    '@type': 'Person',
+    name: siteMetadata.name,
   }
 
   const structuredData = {
@@ -147,7 +137,7 @@ export const BlogSEO = ({
     author: authorList,
     publisher: {
       '@type': 'Organization',
-      name: siteMetadata.author,
+      name: siteMetadata.name,
       logo: {
         '@type': 'ImageObject',
         url: `${siteMetadata.siteUrl}${siteMetadata.siteLogo}`,
