@@ -21,13 +21,12 @@ const Disqus = ({ frontMatter }: Props) => {
     }
     if (globalThis.DISQUS) {
       globalThis.DISQUS.reset({ reload: true })
-    } else {
+    } else if ('disqus' in siteMetadata.comment) {
       const script = document.createElement('script')
       script.src = `https://${siteMetadata.comment.disqus.shortname}.disqus.com/embed.js`
       script.async = true
       script.setAttribute('data-timestamp', String(new Date().getTime()))
       script.setAttribute('crossorigin', 'anonymous')
-
       document.body.appendChild(script)
     }
   }

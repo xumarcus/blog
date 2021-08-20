@@ -17,13 +17,16 @@
 
 import { AuthorFrontMatter } from './AuthorFrontMatter'
 
-type CommentProvider =
+type Analytics =
+  | { plausibleDataDomain: string } // e.g. tailwind-nextjs-starter-blog.vercel.app
+  | { simpleAnalytics: boolean }
+  | { googleAnalyticsId: string } // e.g. UA-000000-2 or G-XXXXXXX
+
+// Select a provider and use the environment variables associated to it
+// https://vercel.com/docs/environment-variables
+type Comment =
   | {
-      giscusConfig: {
-        mapping: 'test'
-      }
-    }
-  | {
+      provider: 'giscus'
       giscusConfig: {
         // Visit the link below, and follow the steps in the string section
         // https://giscus.app/
@@ -47,6 +50,7 @@ type CommentProvider =
       }
     }
   | {
+      provider: 'utterances'
       utterancesConfig: {
         // Visit the link below, and follow the steps in the string section
         // https://utteranc.es/
@@ -61,22 +65,12 @@ type CommentProvider =
       }
     }
   | {
+      provider: 'disqus'
       disqus: {
         // https://help.disqus.com/en/articles/1717111-what-s-a-shortname
         shortname: string // process.env.NEXT_PUBLIC_DISQUS_SHORTNAME
       }
     }
-
-type Analytics =
-  | { plausibleDataDomain: string } // e.g. tailwind-nextjs-starter-blog.vercel.app
-  | { simpleAnalytics: boolean }
-  | { googleAnalyticsId: string } // e.g. UA-000000-2 or G-XXXXXXX
-
-type Comment = {
-  // Select a provider and use the environment variables associated to it
-  // https://vercel.com/docs/environment-variables
-  provider: 'giscus' | 'utterances' | 'disqus'
-} & CommentProvider
 
 export type SiteMetadata = AuthorFrontMatter &
   Partial<{

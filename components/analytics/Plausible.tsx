@@ -2,8 +2,8 @@ import Script from 'next/script'
 
 import siteMetadata from '@/data/siteMetadata'
 
-const PlausibleScript = () => {
-  return (
+const PlausibleScript = () =>
+  'plausibleDataDomain' in siteMetadata.analytics ? (
     <>
       <Script
         strategy="lazyOnload"
@@ -12,12 +12,11 @@ const PlausibleScript = () => {
       />
       <Script strategy="lazyOnload">
         {`
-            window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
-        `}
+              window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
+          `}
       </Script>
     </>
-  )
-}
+  ) : null
 
 export default PlausibleScript
 

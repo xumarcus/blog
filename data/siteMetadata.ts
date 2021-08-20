@@ -2,10 +2,6 @@ import { SiteMetadata } from 'types/SiteMetadata'
 
 const siteMetadata: SiteMetadata = {
   avatar: '/static/images/avatar.png',
-  comment: {
-    provider: 'giscus',
-    giscusConfig: { mapping: 'test' },
-  },
   company: 'National University of Singapore',
   description: 'A blog created with Next.js and Tailwind.css',
   email: 'xumarcus.sg+blog@gmail.com',

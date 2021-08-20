@@ -2,8 +2,8 @@ import Script from 'next/script'
 
 import siteMetadata from '@/data/siteMetadata'
 
-const GAScript = () => {
-  return (
+const GAScript = () =>
+  'googleAnalyticsId' in siteMetadata.analytics ? (
     <>
       <Script
         strategy="lazyOnload"
@@ -21,8 +21,7 @@ const GAScript = () => {
         `}
       </Script>
     </>
-  )
-}
+  ) : null
 
 export default GAScript
 
