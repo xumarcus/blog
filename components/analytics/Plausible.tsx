@@ -3,7 +3,7 @@ import Script from 'next/script'
 import siteMetadata from '@/data/siteMetadata'
 
 const PlausibleScript = () =>
-  'plausibleDataDomain' in siteMetadata.analytics ? (
+  siteMetadata.analytics && 'plausibleDataDomain' in siteMetadata.analytics ? (
     <>
       <Script
         strategy="lazyOnload"

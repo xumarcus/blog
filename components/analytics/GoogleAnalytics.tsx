@@ -3,7 +3,7 @@ import Script from 'next/script'
 import siteMetadata from '@/data/siteMetadata'
 
 const GAScript = () =>
-  'googleAnalyticsId' in siteMetadata.analytics ? (
+  siteMetadata.analytics && 'googleAnalyticsId' in siteMetadata.analytics ? (
     <>
       <Script
         strategy="lazyOnload"

@@ -16,7 +16,7 @@ const Utterances = ({ issueTerm }: Props) => {
   function LoadComments() {
     setEnabledLoadComments(false)
     const script = document.createElement('script')
-    if ('utterancesConfig' in siteMetadata.comment) {
+    if (siteMetadata.comment && 'utterancesConfig' in siteMetadata.comment) {
       const commentsTheme =
         theme === 'dark' || resolvedTheme === 'dark'
           ? siteMetadata.comment.utterancesConfig.darkTheme

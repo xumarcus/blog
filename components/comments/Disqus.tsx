@@ -21,7 +21,7 @@ const Disqus = ({ frontMatter }: Props) => {
     }
     if (globalThis.DISQUS) {
       globalThis.DISQUS.reset({ reload: true })
-    } else if ('disqus' in siteMetadata.comment) {
+    } else if (siteMetadata.comment && 'disqus' in siteMetadata.comment) {
       const script = document.createElement('script')
       script.src = `https://${siteMetadata.comment.disqus.shortname}.disqus.com/embed.js`
       script.async = true

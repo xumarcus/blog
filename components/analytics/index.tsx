@@ -17,9 +17,15 @@ const isProduction = process.env.NODE_ENV === 'production'
 const Analytics = () => {
   return (
     <>
-      {isProduction && 'plausibleDataDomain' in siteMetadata.analytics && <Plausible />}
-      {isProduction && 'simpleAnalytics' in siteMetadata.analytics && <SimpleAnalytics />}
-      {isProduction && 'googleAnalyticsId' in siteMetadata.analytics && <GA />}
+      {isProduction &&
+        siteMetadata.analytics &&
+        'plausibleDataDomain' in siteMetadata.analytics && <Plausible />}
+      {isProduction && siteMetadata.analytics && 'simpleAnalytics' in siteMetadata.analytics && (
+        <SimpleAnalytics />
+      )}
+      {isProduction && siteMetadata.analytics && 'googleAnalyticsId' in siteMetadata.analytics && (
+        <GA />
+      )}
     </>
   )
 }

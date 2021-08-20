@@ -16,7 +16,7 @@ const Giscus = ({ mapping }: Props) => {
   function LoadComments() {
     setEnabledLoadComments(false)
     const script = document.createElement('script')
-    if ('giscusConfig' in siteMetadata.comment) {
+    if (siteMetadata.comment && 'giscusConfig' in siteMetadata.comment) {
       const commentsTheme =
         siteMetadata.comment.giscusConfig.themeURL === ''
           ? theme === 'dark' || resolvedTheme === 'dark'
