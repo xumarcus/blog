@@ -20,7 +20,7 @@ The dollar signal displays without issue since only text without space and betwe
 
 Inline or manually enumerated footnotes are also supported. Click on the links above to see them in action.
 
-[^2]: Here's $10 and $20.
+[^2]: Here's $10$ and $20$.
 
 # Deriving the OLS Estimator
 
