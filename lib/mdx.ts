@@ -55,7 +55,7 @@ export function dateSortDesc(a: string, b: string) {
   return 0
 }
 
-interface FileBySlug<T> {
+interface MDFile<T> {
   mdxSource: string
   toc: Toc
   frontMatter: T & {
@@ -66,12 +66,17 @@ interface FileBySlug<T> {
   }
 }
 
-export async function getFileBySlug<T>(
-  type: 'authors' | 'blog',
-  slug: string | string[]
-): Promise<FileBySlug<T>> {
-  const mdxPath = path.join(root, 'data', type, `${slug}.mdx`)
+export async function getAuthorFrontMatterBySlug(slug: string): Promise<MDFile<AuthorFrontMatter>> {
+  return getMDFile('authors', slug)
+}
+
+export async function getPostFrontMatterBySlug(slug: string): Promise<MDFile<PostFrontMatter>> {
+  return getMDFile('blog', slug)
+}
+
+async function getMDFile<T>(type: 'authors' | 'blog', slug: string): Promise<MDFile<T>> {
   const mdPath = path.join(root, 'data', type, `${slug}.md`)
+  const mdxPath = `${mdPath}x`
   const source = fs.existsSync(mdxPath)
     ? fs.readFileSync(mdxPath, 'utf8')
     : fs.readFileSync(mdPath, 'utf8')

@@ -12,7 +12,7 @@ interface Props {
 
 export default function AuthorLayout({ children, frontMatter }: Props) {
   const { avatar, company, occupation, name } = frontMatter
-
+  console.log(avatar)
   return (
     <>
       <PageSEO title={`About - ${name}`} description={`About me - ${name}`} />

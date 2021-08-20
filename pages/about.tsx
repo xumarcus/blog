@@ -1,26 +1,17 @@
 import { MDXLayoutRenderer } from '@/components/MDXComponents'
-import { getFileBySlug } from '@/lib/mdx'
+import siteMetadata from '@/data/siteMetadata'
+import { getAuthorFrontMatterBySlug } from '@/lib/mdx'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { AuthorFrontMatter } from 'types/AuthorFrontMatter'
-
-const DEFAULT_LAYOUT = 'AuthorLayout'
 
 export const getStaticProps: GetStaticProps<{
-  authorDetails: { mdxSource: string; frontMatter: AuthorFrontMatter }
+  mdxSource: string
 }> = async () => {
-  const authorDetails = await getFileBySlug<AuthorFrontMatter>('authors', ['default'])
-  const { mdxSource, frontMatter } = authorDetails
-  return { props: { authorDetails: { mdxSource, frontMatter } } }
+  const { mdxSource } = await getAuthorFrontMatterBySlug('default')
+  return { props: { mdxSource } }
 }
 
-export default function About({ authorDetails }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { mdxSource, frontMatter } = authorDetails
-
+export default function About({ mdxSource }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <MDXLayoutRenderer
-      layout={frontMatter.layout || DEFAULT_LAYOUT}
-      mdxSource={mdxSource}
-      frontMatter={frontMatter}
-    />
+    <MDXLayoutRenderer layout="AuthorLayout" mdxSource={mdxSource} frontMatter={siteMetadata} />
   )
 }

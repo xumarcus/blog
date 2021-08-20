@@ -2,11 +2,18 @@ import fs from 'fs'
 import PageTitle from '@/components/PageTitle'
 import generateRss from '@/lib/generate-rss'
 import { MDXLayoutRenderer } from '@/components/MDXComponents'
-import { formatSlug, getAllFilesFrontMatter, getFileBySlug, getFiles } from '@/lib/mdx'
+import {
+  formatSlug,
+  getAllFilesFrontMatter,
+  getAuthorFrontMatterBySlug,
+  getFiles,
+  getPostFrontMatterBySlug,
+} from '@/lib/mdx'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { AuthorFrontMatter } from 'types/AuthorFrontMatter'
 import { PostFrontMatter } from 'types/PostFrontMatter'
 import { Toc } from 'types/Toc'
+import siteMetadata from '@/data/siteMetadata'
 
 const DEFAULT_LAYOUT = 'PostLayout'
 
@@ -33,13 +40,18 @@ export const getStaticProps: GetStaticProps<{
   const postIndex = allPosts.findIndex((post) => formatSlug(post.slug) === slug)
   const prev: { slug: string; title: string } = allPosts[postIndex + 1] || null
   const next: { slug: string; title: string } = allPosts[postIndex - 1] || null
-  const post = await getFileBySlug<PostFrontMatter>('blog', slug)
+  const post = await getPostFrontMatterBySlug(slug)
   const authorList = post.frontMatter.authors || ['default']
-  const authorPromise = authorList.map(async (author) => {
-    const authorResults = await getFileBySlug<AuthorFrontMatter>('authors', [author])
-    return authorResults.frontMatter
-  })
-  const authorDetails = await Promise.all(authorPromise)
+  const authorDetails = await Promise.all(
+    authorList.map(async (authorSlug) => {
+      if (authorSlug === 'default') {
+        return siteMetadata
+      } else {
+        const authorResult = await getAuthorFrontMatterBySlug(authorSlug)
+        return authorResult.frontMatter
+      }
+    })
+  )
 
   // rss
   const rss = generateRss(allPosts)
