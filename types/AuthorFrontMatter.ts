@@ -1,11 +1,9 @@
-export type AuthorFrontMatter = {
+import { SocialIconKind } from './constants'
+
+export interface AuthorFrontMatter extends Partial<Record<SocialIconKind, string>> {
+  avatar: string
+  company: string
   layout?: string
   name: string
-  avatar: string
   occupation: string
-  company: string
-  email: string
-  twitter: string
-  linkedin: string
-  github: string
 }

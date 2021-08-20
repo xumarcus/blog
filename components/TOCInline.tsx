@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { Toc } from 'types/Toc'
 
 interface TOCInlineProps {
@@ -7,6 +8,7 @@ interface TOCInlineProps {
   toHeading?: number
   asDisclosure?: boolean
   exclude?: string | string[]
+  children?: ReactNode
 }
 
 /**

@@ -1,10 +1,10 @@
 ---
 name: Marcus Xu
 avatar: /static/images/avatar.png
-occupation: Student (BSc Computer Science & BSc Mathematics)
+occupation: Student
 company: National University of Singapore
 email: xumarcus.sg+blog@gmail.com
-twitter: https://twitter.com/Twitter
+telegram: https://t.me/deces0
 linkedin: https://www.linkedin.com/in/xumarcus
 github: https://github.com/xumarcus
 ---

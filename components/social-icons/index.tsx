@@ -1,22 +1,32 @@
-import Mail from './mail.svg'
-import Github from './github.svg'
+import { SocialIconKind } from 'types/constants'
+import Email from './email.svg'
 import Facebook from './facebook.svg'
-import Youtube from './youtube.svg'
+import Github from './github.svg'
 import Linkedin from './linkedin.svg'
+import Telegram from './telegram.svg'
 import Twitter from './twitter.svg'
+import Youtube from './youtube.svg'
 
 // Icons taken from: https://simpleicons.org/
 
-const components = {
-  mail: Mail,
-  github: Github,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const components: Record<SocialIconKind, any> = {
+  email: Email,
   facebook: Facebook,
-  youtube: Youtube,
+  github: Github,
   linkedin: Linkedin,
+  telegram: Telegram,
   twitter: Twitter,
+  youtube: Youtube,
 }
 
-const SocialIcon = ({ kind, href, size = 8 }) => {
+interface Props {
+  kind: SocialIconKind
+  href: string
+  size?: number
+}
+
+const SocialIcon = ({ kind, href, size = 8 }: Props) => {
   if (!href) return null
 
   const SocialSvg = components[kind]
@@ -26,7 +36,7 @@ const SocialIcon = ({ kind, href, size = 8 }) => {
       className="text-sm text-gray-500 transition hover:text-gray-600"
       target="_blank"
       rel="noopener noreferrer"
-      href={href}
+      href={kind === 'email' ? `mailto:${href}` : href}
     >
       <span className="sr-only">{kind}</span>
       <SocialSvg

@@ -15,23 +15,20 @@ const Disqus = ({ frontMatter }: Props) => {
   function LoadComments() {
     setEnabledLoadComments(false)
 
-    // @ts-ignore
-    window.disqus_config = function () {
+    globalThis.disqus_config = function () {
       this.page.url = window.location.href
       this.page.identifier = frontMatter.slug
     }
-    // @ts-ignore
-    if (window.DISQUS === undefined) {
-      const script = document.createElement('script')
-      script.src = 'https://' + siteMetadata.comment.disqus.shortname + '.disqus.com/embed.js'
-      // @ts-ignore
-      script.setAttribute('data-timestamp', +new Date())
-      script.setAttribute('crossorigin', 'anonymous')
-      script.async = true
-      document.body.appendChild(script)
+    if (globalThis.DISQUS) {
+      globalThis.DISQUS.reset({ reload: true })
     } else {
-      // @ts-ignore
-      window.DISQUS.reset({ reload: true })
+      const script = document.createElement('script')
+      script.src = `https://${siteMetadata.comment.disqus.shortname}.disqus.com/embed.js`
+      script.async = true
+      script.setAttribute('data-timestamp', String(new Date().getTime()))
+      script.setAttribute('crossorigin', 'anonymous')
+
+      document.body.appendChild(script)
     }
   }
 

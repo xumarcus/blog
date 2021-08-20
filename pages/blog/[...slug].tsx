@@ -22,7 +22,6 @@ export async function getStaticPaths() {
   }
 }
 
-// @ts-ignore
 export const getStaticProps: GetStaticProps<{
   post: { mdxSource: string; toc: Toc; frontMatter: PostFrontMatter }
   authorDetails: AuthorFrontMatter[]
@@ -35,7 +34,6 @@ export const getStaticProps: GetStaticProps<{
   const prev: { slug: string; title: string } = allPosts[postIndex + 1] || null
   const next: { slug: string; title: string } = allPosts[postIndex - 1] || null
   const post = await getFileBySlug<PostFrontMatter>('blog', slug)
-  // @ts-ignore
   const authorList = post.frontMatter.authors || ['default']
   const authorPromise = authorList.map(async (author) => {
     const authorResults = await getFileBySlug<AuthorFrontMatter>('authors', [author])
