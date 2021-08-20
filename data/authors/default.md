@@ -1,16 +1,14 @@
 ---
-name: Tails Azimuth
+name: Marcus Xu
 avatar: /static/images/avatar.png
-occupation: Professor of Atmospheric Science
-company: Stanford University
-email: address@yoursite.com
+occupation: Student (BSc Computer Science & BSc Mathematics)
+company: National University of Singapore
+email: xumarcus.sg+blog@gmail.com
 twitter: https://twitter.com/Twitter
-linkedin: https://www.linkedin.com
-github: https://github.com
+linkedin: https://www.linkedin.com/in/xumarcus
+github: https://github.com/xumarcus
 ---
 
-Tails Azimuth is a professor of atmospheric sciences at the Stanford AI Lab. His research interests includes complexity modelling of tailwinds, headwinds and crosswinds.
+Hi! I am a student at NUS studying BSc CS & BSc Math. I am a jack of all trades, master of none when it comes to computers. I develop AI-powered web apps like this, join CTFs and programming competitions and intern. That's why I can do [C](https://en.wikipedia.org/wiki/C_(programming_language)), [Python](https://www.python.org/), [Rust](https://www.rust-lang.org/) and [Typescript](https://www.typescriptlang.org/). I know some [Haskell](https://www.haskell.org/) to see what's the FP hype is about. I also have some experience with [NodeJS](https://nodejs.org/) and [Postgres](https://www.postgresql.org/) during my internships, though most of the projects you find here are SPAs because servers are expensive.
 
-He leads the clean energy group which develops 3D air pollution-climate models, writes differential equation solvers, and manufactures titanium plated air ballons. In his free time he bakes raspberry pi.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.
+Feel free to drop me a message by [email](mailto:xumarcus.sg+blog@gmail.com) if you are looking to do business, have some questions, or just need some help.
