@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-
-import siteMetadata from '@/data/siteMetadata'
 import { PostFrontMatter } from 'types/PostFrontMatter'
+import { DisqusConfig } from 'types/SiteMetadata'
 
 interface Props {
+  disqusConfig: DisqusConfig
   frontMatter: PostFrontMatter
 }
 
-const Disqus = ({ frontMatter }: Props) => {
+const Disqus = ({ disqusConfig, frontMatter }: Props) => {
   const [enableLoadComments, setEnabledLoadComments] = useState(true)
 
   const COMMENTS_ID = 'disqus_thread'
@@ -21,9 +21,9 @@ const Disqus = ({ frontMatter }: Props) => {
     }
     if (globalThis.DISQUS) {
       globalThis.DISQUS.reset({ reload: true })
-    } else if (siteMetadata.comment && 'disqus' in siteMetadata.comment) {
+    } else {
       const script = document.createElement('script')
-      script.src = `https://${siteMetadata.comment.disqus.shortname}.disqus.com/embed.js`
+      script.src = `https://${disqusConfig.shortname}.disqus.com/embed.js`
       script.async = true
       script.setAttribute('data-timestamp', String(new Date().getTime()))
       script.setAttribute('crossorigin', 'anonymous')

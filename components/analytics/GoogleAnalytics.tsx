@@ -1,27 +1,24 @@
 import Script from 'next/script'
 
-import siteMetadata from '@/data/siteMetadata'
+const GAScript = ({ googleAnalyticsId }) => (
+  <>
+    <Script
+      strategy="lazyOnload"
+      src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
+    />
 
-const GAScript = () =>
-  siteMetadata.analytics && 'googleAnalyticsId' in siteMetadata.analytics ? (
-    <>
-      <Script
-        strategy="lazyOnload"
-        src={`https://www.googletagmanager.com/gtag/js?id=${siteMetadata.analytics.googleAnalyticsId}`}
-      />
-
-      <Script strategy="lazyOnload">
-        {`
+    <Script strategy="lazyOnload">
+      {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${siteMetadata.analytics.googleAnalyticsId}', {
+            gtag('config', '${googleAnalyticsId}', {
               page_path: window.location.pathname,
             });
         `}
-      </Script>
-    </>
-  ) : null
+    </Script>
+  </>
+)
 
 export default GAScript
 

@@ -26,7 +26,7 @@ const DisqusComponent = dynamic(
 )
 
 const Comments = ({ frontMatter }: Props) => {
-  const getTerm = (key: string): string => {
+  const transform = (key: string): string => {
     switch (key) {
       case 'pathname':
         return frontMatter.slug
@@ -37,14 +37,28 @@ const Comments = ({ frontMatter }: Props) => {
     }
   }
   switch (siteMetadata.comment?.provider) {
-    case 'giscus':
-      return <GiscusComponent mapping={getTerm(siteMetadata.comment.giscusConfig.mapping)} />
-    case 'utterances':
+    case 'giscus': {
+      const { giscusConfig } = siteMetadata.comment
       return (
-        <UtterancesComponent issueTerm={getTerm(siteMetadata.comment.utterancesConfig.issueTerm)} />
+        <GiscusComponent giscusConfig={giscusConfig} mapping={transform(giscusConfig.mapping)} />
       )
+    }
+    case 'utterances': {
+      const { utterancesConfig } = siteMetadata.comment
+      return (
+        <UtterancesComponent
+          utterancesConfig={utterancesConfig}
+          issueTerm={transform(utterancesConfig.issueTerm)}
+        />
+      )
+    }
     case 'disqus':
-      return <DisqusComponent frontMatter={frontMatter} />
+      return (
+        <DisqusComponent
+          disqusConfig={siteMetadata.comment.disqusConfig}
+          frontMatter={frontMatter}
+        />
+      )
     default:
       return null
   }

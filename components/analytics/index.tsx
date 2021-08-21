@@ -12,22 +12,20 @@ declare global {
   }
 }
 
-const isProduction = process.env.NODE_ENV === 'production'
-
 const Analytics = () => {
-  return (
-    <>
-      {isProduction &&
-        siteMetadata.analytics &&
-        'plausibleDataDomain' in siteMetadata.analytics && <Plausible />}
-      {isProduction && siteMetadata.analytics && 'simpleAnalytics' in siteMetadata.analytics && (
-        <SimpleAnalytics />
-      )}
-      {isProduction && siteMetadata.analytics && 'googleAnalyticsId' in siteMetadata.analytics && (
-        <GA />
-      )}
-    </>
-  )
+  if (process.env.NODE_ENV !== 'production') {
+    return null
+  }
+  switch (siteMetadata.analytics?.provider) {
+    case 'googleAnalytics':
+      return <GA googleAnalyticsId={siteMetadata.analytics.googleAnalyticsId} />
+    case 'plausible':
+      return <Plausible plausibleDataDomain={siteMetadata.analytics.plausibleDataDomain} />
+    case 'simpleAnalytics':
+      return <SimpleAnalytics />
+    default:
+      return null
+  }
 }
 
 export default Analytics
