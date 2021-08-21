@@ -1,3 +1,9 @@
+/**
+ * scripts/generate-sitemap.js cannot read TS module siteMetadata.ts
+ *
+ * Have to keep this for compatibility
+ */
+
 const _siteMetadata = {
   avatar: '/static/images/avatar.png',
   company: 'National University of Singapore',
