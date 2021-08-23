@@ -10,7 +10,7 @@ const _siteMetadata = {
   description: 'A blog created with Next.js and Tailwind.css',
   email: 'xumarcus.sg+blog@gmail.com',
   github: 'https://github.com/xumarcus',
-  headerTitle: 'TailwindBlog',
+  headerTitle: "Marcus Xu's Blog",
   language: 'en-us',
   linkedin: 'https://www.linkedin.com/in/xumarcus',
   locale: 'en-US',
@@ -21,7 +21,7 @@ const _siteMetadata = {
   siteUrl: 'https://blog-xumarcus.vercel.app/',
   socialBanner: '/static/images/twitter-card.png',
   telegram: 'https://t.me/deces0',
-  title: 'Next.js Starter Blog',
+  title: "Marcus Xu's Blog",
 }
 
 module.exports = _siteMetadata
