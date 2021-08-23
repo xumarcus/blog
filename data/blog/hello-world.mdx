@@ -1,0 +1,38 @@
+---
+title: Hello World
+date: '2021-08-21'
+tags: ['nextJS']
+draft: false
+summary: Setting up this blog
+images: []
+layout: PostLayout
+authors: ['default']
+---
+
+For software developers, portfolio website offers a platform to show ~~that you can code~~ your expertise and ~~that you can write~~ copywriting skills with personal projects and blog posts. More importantly, it doesn't look nice on resume that you don't have one. Maybe it can help getting some freelance web development jobs to subsidize poor students like me as well. That's why I started looking for options.
+
+Wordpress is the most popular choice. It comes with a lot of plugins and themes, which is great for those with no art skills like me; security is a great concern though - every plugin is a potential vulnerability, and small misconfigurations can spell big troubles. Migrating between hosting providers is also non-trivial. Static site generators, on the other hand, just serve you pre-rendered web pages. That means no vulnerabilities unless you compromise the hosting provider. I don't think anyone will go through the big trouble to hack small fry sites like this.
+
+For deployment, usually Github Pages suffices. Here Vercel is preferred, since this site uses NextJS; which is a surprisingly great static site generator, considering that its key feature is hybrid static and server rendering. And whereas Github Pages serve only static content, Vercel apparently gives you a server for free, though with limited bandwidth and CPU usage (of course).
+
+<SimpleLineChart
+  data={[
+    ["'09", 2900],
+    ["'10", 3289],
+    ["'11", 3425],
+    ["'12", 3683],
+    ["'13", 3953],
+    ["'14", 3712],
+    ["'15", 3890],
+    ["'16", 4385],
+    ["'17", 4628],
+    ["'18", 4658],
+    ["'19", 5000],
+    ["'20", 5243],
+  ]}
+  formatter={(value) => `S$${value}`}
+  name="Median income"
+  title="NUS BSc Computer Science"
+/>
+
+Together with the utils this template provides / installs such as `mdx-bundler`, I can put not just images / videos, but React components from my projects inside Markdown files, which should be great for literate programming.
