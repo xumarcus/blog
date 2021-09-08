@@ -38,4 +38,6 @@ lpr -Ppsts -# 2 input.ps
 psnup -2up input.ps output.ps
 ```
 
-The article linked explains everything in greater detail. Anyway, note the following: - 2nd argument of `scp` should end with a colon (`:`), otherwise the command exits copying `input.pdf` to a local file `MYSOC_USERNAME@sunfire.comp.nus.edu.sg` without warning. - When you `ssh`, use your `MYSOC_USERNAME` which might not be the same as your `NUSNET_ID` (e0123456). - The printer emits a page showing your quota for every print job. There's 50 pages per month, with 50 pages overdraft.
+The article linked explains everything in greater detail. Anyway, note the following:
+_ 2nd argument of `scp` should end with a colon (`:`), otherwise the command exits copying `input.pdf` to a local file `MYSOC_USERNAME@sunfire.comp.nus.edu.sg` without warning.
+_ When you `ssh`, use your `MYSOC_USERNAME` which might not be the same as your `NUSNET_ID` (e0123456). \* The printer emits a page showing your quota for every print job. There's 50 pages per month, with 50 pages overdraft.
