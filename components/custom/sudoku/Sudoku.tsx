@@ -20,6 +20,11 @@ import React, { useState } from 'react'
 import CellGrid from '../CellGrid'
 import SquareWrapper from '../SquareWrapper'
 
+/**
+ * BUG: Popover moves upon re-rendering on non-Mobile platforms.
+ * Issue seems to be with anchorOrigin/transformOrigin
+ */
+
 const SudokuCell = (row: number, col: number) => {
   const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null)
   const [cellNum, setCellNum] = useState(row * col)
