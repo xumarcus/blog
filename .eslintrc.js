@@ -29,7 +29,7 @@ module.exports = {
       },
     ],
     'react/prop-types': 0,
-    'no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
+    'no-unused-vars': 0,
     'react/no-unescaped-entities': 0,
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-var-requires': 'off',

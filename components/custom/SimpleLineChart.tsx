@@ -35,7 +35,7 @@ interface Props {
   title?: string
 }
 
-// Ugly hack for `MDXComponents.tsx`
+// Explicitly typing `React.FunctionComponent<Props>` is a hack for `MDXComponents.tsx`
 const SimpleLineChart: React.FunctionComponent<Props> = ({
   data,
   formatter,

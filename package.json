@@ -42,6 +42,7 @@
     "@next/bundle-analyzer": "11.0.1",
     "@svgr/webpack": "^5.5.0",
     "@types/lodash": "^4.14.172",
+    "@types/ramda": "^0.27.44",
     "@types/react": "^17.0.14",
     "@types/tailwindcss": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
@@ -60,6 +61,7 @@
     "lint-staged": "^11.0.0",
     "next-remote-watch": "^1.0.0",
     "prettier": "2.2.1",
+    "ramda": "^0.27.1",
     "typescript": "^4.3.5",
     "webpack-cli": "^4.8.0"
   },
