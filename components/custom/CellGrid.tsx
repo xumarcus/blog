@@ -15,28 +15,47 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
+import React, { useRef, useState } from 'react'
+import useResizeObserver from '@react-hook/resize-observer'
 import * as R from 'ramda'
 
-interface Props {
-  rowCount: number
-  colCount: number
-  cellConstructor: (
-    row: number,
-    col: number
-  ) => React.ReactNode & {
-    onClick?: () => void
-  }
+interface CellSquareProps {
+  row: number
+  col: number
+  cellConstructor: CellConstructor
+}
+
+type CellConstructor = (
+  row: number,
+  col: number
+) => React.ReactNode & {
+  onClick?: () => void
 }
 
 /**
  * `cellConstructor` should have `w-full h-full` tailwind classes
  */
+const CellSquare = ({ row, col, cellConstructor }: CellSquareProps) => {
+  const [height, setHeight] = useState(0)
+  const ref = useRef(null)
+  useResizeObserver(ref, (e) => {
+    const { left, right } = e.contentRect
+    setHeight(left + right)
+  })
+  return (
+    <td key={col} ref={ref} style={{ height }}>
+      {cellConstructor(row, col)}
+    </td>
+  )
+}
+
+interface Props {
+  rowCount: number
+  colCount: number
+  cellConstructor: CellConstructor
+}
+
 const CellGrid = ({ rowCount, colCount, cellConstructor }: Props) => {
-  const cellContainerStyle = {
-    height: `${(50 / rowCount).toFixed(2)}vw`,
-    width: `${(50 / colCount).toFixed(2)}vw`,
-  }
   return (
     <table>
       <thead>
@@ -54,13 +73,14 @@ const CellGrid = ({ rowCount, colCount, cellConstructor }: Props) => {
         {R.range(0, rowCount).map((row) => (
           <tr key={row}>
             <td className="text-right">{1 + row}</td>
-            {R.range(0, colCount).map((col) => {
-              return (
-                <td key={col}>
-                  <div style={cellContainerStyle}>{cellConstructor(row, col)}</div>
-                </td>
-              )
-            })}
+            {R.range(0, colCount).map((col) => (
+              <CellSquare
+                key={`${row} ${col}`}
+                row={row}
+                col={col}
+                cellConstructor={cellConstructor}
+              />
+            ))}
             <td className="text-left">{1 + row}</td>
             {/* Tailwind set different width for first/last columns */}
           </tr>
