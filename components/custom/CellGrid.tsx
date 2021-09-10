@@ -15,32 +15,42 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Table } from '@material-ui/core'
 import * as R from 'ramda'
-import React from 'react'
+import React, { HTMLAttributes } from 'react'
+import { Table } from '@material-ui/core'
+import styles from './CellGrid.module.scss'
 
-type CellConstructor = (
-  row: number,
+export interface Coordinates {
+  row: number
   col: number
-) => React.ReactNode & {
-  onClick?: () => void
 }
 
-interface Props {
+export const toIndex = ({ row, col }: Coordinates, colCount: number) => row * colCount + col
+
+interface Props<T> extends HTMLAttributes<HTMLDivElement> {
+  values: T[]
   showCoordinates: boolean
   rowCount: number
   colCount: number
-  cellConstructor: CellConstructor
+  cellConstructor: (
+    value: T,
+    row: number,
+    col: number
+  ) => React.ReactNode & {
+    onClick?: () => void
+  }
 }
 
-/**
- * BUG: Dark mode is not applied on Popover
- * Issue seems to be with Tailwind/MaterialUI integration
- */
-
-const CellGrid = ({ showCoordinates, rowCount, colCount, cellConstructor }: Props) => {
+const CellGrid = <T extends unknown>({
+  className,
+  values,
+  showCoordinates,
+  rowCount,
+  colCount,
+  cellConstructor,
+}: Props<T>) => {
   return (
-    <Table style={{ tableLayout: 'fixed' }}>
+    <Table className={`${styles.cellGrid} ${className}`}>
       {showCoordinates && (
         <thead>
           <tr>
@@ -57,18 +67,14 @@ const CellGrid = ({ showCoordinates, rowCount, colCount, cellConstructor }: Prop
       <tbody>
         {R.range(0, rowCount).map((row) => (
           <tr key={row}>
-            {showCoordinates && (
-              <td align="right" style={{ display: 'table-cell', verticalAlign: 'middle' }}>
-                {1 + row}
-              </td>
-            )}
+            {showCoordinates && <td align="right">{1 + row}</td>}
             {R.range(0, colCount).map((col) => (
               <td align="center" key={`${row}${col}`}>
-                {cellConstructor(row, col)}
+                {cellConstructor(values[row * rowCount + col], row, col)}
               </td>
             ))}
             {showCoordinates && <td />}
-            {/* Tailwind set different width for first/last columns */}
+            {/* Symmetry */}
           </tr>
         ))}
       </tbody>

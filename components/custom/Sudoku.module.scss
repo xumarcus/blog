@@ -15,8 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-onmessage = (e) => {
-  postMessage([1])
+table.sudoku {
+  td {
+    min-width: 30px;
+  }
+  td:nth-child(4),
+  td:nth-child(7) {
+    border-right: solid;
+  }
+  tr:nth-child(4),
+  tr:nth-child(7) {
+    border-top: solid;
+    /*
+    td:first-child,
+    td:last-child {
+       border-top: hidden; 
+    }
+    */
+  }
 }
-
-export {}

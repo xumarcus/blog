@@ -15,8 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-onmessage = (e) => {
-  postMessage([1])
-}
+table.cellGrid {
+  /* Same cell size regardless of content */
+  table-layout: fixed;
 
-export {}
+  td {
+    /* Is centering indices confusing?
+    display: table-cell;
+    vertical-align: middle;
+    */
+
+    /* Tailwind first/last child padding */
+    padding: 8px;
+  }
+}
