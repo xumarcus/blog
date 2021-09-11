@@ -68,7 +68,6 @@ const Sudoku = () => {
                 const cellValues = newValues.map(fromCellValue)
                 worker.postMessage(cellValues)
                 worker.onmessage = (event) => {
-                  console.log(event.data)
                   if (event.data) {
                     setValues(R.zipWith(toCellValue)(event.data, cellValues))
                     setHasError(false)
