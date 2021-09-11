@@ -38,14 +38,26 @@ const SudokuMenu = ({ onClick }: SudokuMenuProps) => (
       cellConstructor={(value) => {
         return (
           <SquareWrapper>
-            <button className="h-full w-full" onClick={() => onClick && onClick(value)}>
+            <button
+              className="h-full w-full"
+              onClick={() => {
+                if (onClick) onClick(value)
+              }}
+            >
               {value}
             </button>
           </SquareWrapper>
         )
       }}
     />
-    <Button className="w-full">Erase</Button>
+    <Button
+      className="w-full"
+      onClick={() => {
+        if (onClick) onClick(null)
+      }}
+    >
+      Erase
+    </Button>
   </div>
 )
 

@@ -21,6 +21,9 @@ import SquareWrapper from '../SquareWrapper'
 import React, { useState } from 'react'
 import { CellValue } from '../Sudoku'
 import SudokuMenu from './SudokuMenu'
+import styles from './SudokuCell.module.scss'
+
+const classNames = require('classnames')
 
 interface SudokuCellOnClickProps extends Coordinates {
   newValue: number | null
@@ -37,9 +40,10 @@ const SudokuCell = ({ onClick, cellValue, row, col }: SudokuCellProps) => {
     <>
       <SquareWrapper>
         <button
-          className="h-full w-full md:text-lg lg:text-xl"
+          className={classNames('h-full', 'w-full', 'md:text-lg', 'lg:text-xl', {
+            [styles.notInput]: !cellValue?.isInput,
+          })}
           onClick={(event) => setAnchorEl(event.currentTarget)}
-          disabled={cellValue?.isInferred}
         >
           {cellValue?.value}
         </button>
@@ -54,7 +58,12 @@ const SudokuCell = ({ onClick, cellValue, row, col }: SudokuCellProps) => {
         }}
       >
         <SudokuMenu
-          onClick={(newValue: number | null) => onClick && onClick({ newValue, row, col })}
+          onClick={(newValue: number | null) => {
+            if (onClick) {
+              onClick({ newValue, row, col })
+            }
+            setAnchorEl(null)
+          }}
         />
       </Popover>
     </>
