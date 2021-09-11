@@ -27,7 +27,7 @@ export default function remarkCodeTitles() {
         data: { _xdmExplicitJsx: true },
       }
 
-      tree.children.splice(index, 0, titleNode)
+      if (index !== null) tree.children.splice(index, 0, titleNode)
       node.lang = language
     })
 }

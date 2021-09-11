@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const kebabCase = (str: string) =>
   str &&
   str

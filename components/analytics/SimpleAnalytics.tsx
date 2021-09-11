@@ -14,7 +14,8 @@ const SimpleAnalyticsScript = () => {
 }
 
 // https://docs.simpleanalytics.com/events
-export const logEvent = (eventName, callback) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logEvent = (eventName: any, callback: any) => {
   if (callback) {
     return window.sa_event?.(eventName, callback)
   } else {

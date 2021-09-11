@@ -8,9 +8,10 @@ export default function Footer() {
     <footer>
       <div className="flex flex-col items-center mt-16">
         <div className="flex mb-3 space-x-4">
-          {SOCIAL_ICON_KINDS.map((kind) => (
-            <SocialIcon key={kind} kind={kind} href={siteMetadata[kind]} size={6} />
-          ))}
+          {SOCIAL_ICON_KINDS.map((kind) => {
+            const href = siteMetadata[kind]
+            return href ? <SocialIcon key={kind} kind={kind} href={href} size={6} /> : null
+          })}
         </div>
         <div className="flex mb-2 space-x-2 text-sm text-gray-500 dark:text-gray-400">
           <div>{siteMetadata.name}</div>

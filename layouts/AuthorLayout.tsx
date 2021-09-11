@@ -34,9 +34,10 @@ export default function AuthorLayout({ children, frontMatter }: Props) {
             <div className="text-gray-500 dark:text-gray-400">{occupation}</div>
             <div className="text-gray-500 dark:text-gray-400">{company}</div>
             <div className="flex pt-6 space-x-3">
-              {SOCIAL_ICON_KINDS.map((kind) => (
-                <SocialIcon key={kind} kind={kind} href={frontMatter[kind]} />
-              ))}
+              {SOCIAL_ICON_KINDS.map((kind) => {
+                const href = frontMatter[kind]
+                return href ? <SocialIcon key={kind} kind={kind} href={href} /> : null
+              })}
             </div>
           </div>
           <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">{children}</div>

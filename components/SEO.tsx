@@ -49,6 +49,7 @@ interface PageSEOProps {
 }
 
 export const PageSEO = ({ title, description }: PageSEOProps) => {
+  if (siteMetadata.siteUrl === undefined || siteMetadata.socialBanner === undefined) return null
   const ogImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
   const twImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
   return (
@@ -63,9 +64,11 @@ export const PageSEO = ({ title, description }: PageSEOProps) => {
 }
 
 export const TagSEO = ({ title, description }: PageSEOProps) => {
+  const router = useRouter()
+  if (siteMetadata.siteUrl === undefined || siteMetadata.socialBanner === undefined) return null
   const ogImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
   const twImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
-  const router = useRouter()
+
   return (
     <>
       <CommonSEO
@@ -102,6 +105,8 @@ export const BlogSEO = ({
   images = [],
 }: BlogSeoProps) => {
   const router = useRouter()
+  if (date === null) return null
+
   const publishedAt = new Date(date).toISOString()
   const modifiedAt = new Date(lastmod || date).toISOString()
   const imagesArr =
@@ -158,7 +163,7 @@ export const BlogSEO = ({
         twImage={twImageUrl}
       />
       <Head>
-        {date && <meta property="article:published_time" content={publishedAt} />}
+        <meta property="article:published_time" content={publishedAt} />
         {lastmod && <meta property="article:modified_time" content={modifiedAt} />}
         <link rel="canonical" href={`${siteMetadata.siteUrl}${router.asPath}`} />
         <script

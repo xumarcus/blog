@@ -86,17 +86,16 @@ type Comment =
       disqusConfig: DisqusConfig
     }
 
-export type SiteMetadata = AuthorFrontMatter &
-  Partial<{
-    analytics: Analytics
-    comment: Comment
-    description: string
-    headerTitle: string
-    language: string
-    locale: string
-    siteLogo: string
-    siteRepo: string
-    siteUrl: string
-    socialBanner: string
-    title: string
-  }>
+export type SiteMetadata = AuthorFrontMatter & {
+  analytics?: Analytics
+  comment?: Comment
+  description: string
+  headerTitle: string
+  language: string
+  locale: string
+  siteLogo: string
+  siteRepo: string
+  siteUrl: string
+  socialBanner: string
+  title: string
+}

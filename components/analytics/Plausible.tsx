@@ -1,6 +1,10 @@
 import Script from 'next/script'
 
-const PlausibleScript = ({ plausibleDataDomain }) => (
+interface Props {
+  plausibleDataDomain: string
+}
+
+const PlausibleScript = ({ plausibleDataDomain }: Props) => (
   <>
     <Script
       strategy="lazyOnload"
@@ -18,6 +22,7 @@ const PlausibleScript = ({ plausibleDataDomain }) => (
 export default PlausibleScript
 
 // https://plausible.io/docs/custom-event-goals
-export const logEvent = (eventName, ...rest) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logEvent = (eventName: any, ...rest: any[]) => {
   return window.plausible?.(eventName, ...rest)
 }

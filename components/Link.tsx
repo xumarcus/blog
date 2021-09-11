@@ -6,10 +6,7 @@ const CustomLink = ({
   href,
   ...rest
 }: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>) => {
-  const isInternalLink = href && href.startsWith('/')
-  const isAnchorLink = href && href.startsWith('#')
-
-  if (isInternalLink) {
+  if (href && href.startsWith('/')) {
     return (
       <Link href={href}>
         <a {...rest} />
@@ -17,7 +14,7 @@ const CustomLink = ({
     )
   }
 
-  if (isAnchorLink) {
+  if (href && href.startsWith('#')) {
     return <a href={href} {...rest} />
   }
 

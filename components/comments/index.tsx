@@ -34,6 +34,8 @@ const Comments = ({ frontMatter }: Props) => {
         return window.location.href
       case 'title':
         return frontMatter.title
+      default:
+        throw new Error()
     }
   }
   switch (siteMetadata.comment?.provider) {

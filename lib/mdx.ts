@@ -62,7 +62,7 @@ interface MDFile<T> {
     readingTime: ReturnType<typeof readingTime>
     slug: string | string[]
     fileName: string
-    date: string
+    date: string | null
   }
 }
 
@@ -128,7 +128,7 @@ async function getMDFile<T>(type: 'authors' | 'blog', slug: string): Promise<MDF
             visit(tree, 'element', (node) => {
               const [token, type] = node.properties.className || []
               if (token === 'token') {
-                node.properties.className = [tokenClassNames[type]]
+                node.properties.className = [tokenClassNames[type as keyof typeof tokenClassNames]]
               }
             })
           }
@@ -151,7 +151,7 @@ async function getMDFile<T>(type: 'authors' | 'blog', slug: string): Promise<MDF
     frontMatter: {
       ...(frontmatter as T),
       readingTime: readingTime(code),
-      slug: slug || null,
+      slug,
       fileName: fs.existsSync(mdxPath) ? `${slug}.mdx` : `${slug}.md`,
       date: frontmatter.date ? new Date(frontmatter.date).toISOString() : null,
     },
@@ -179,7 +179,7 @@ export async function getAllFilesFrontMatter(folder: 'blog') {
       allFrontMatter.push({
         ...frontmatter,
         slug: formatSlug(fileName),
-        date: frontmatter.date ? new Date(frontmatter.date).toISOString() : null,
+        date: new Date(frontmatter.date).toISOString(),
       })
     }
   })

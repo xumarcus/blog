@@ -168,4 +168,4 @@ const pruneBuf = (buf: CellConstraints[]): CellConstraints[] | null => {
 }
 
 // Required for Web Worker
-onmessage = ({ data }) => postMessage(solve(data))
+onmessage = ({ data }) => postMessage(solve(data), '*')

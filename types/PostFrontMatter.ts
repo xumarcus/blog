@@ -4,7 +4,7 @@ export type PostFrontMatter = {
   tags: string[]
   lastmod?: string
   draft?: boolean
-  summary?: string
+  summary: string
   images?: string[]
   authors?: string[]
   layout?: string

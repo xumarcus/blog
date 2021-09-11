@@ -1,6 +1,10 @@
 import Script from 'next/script'
 
-const GAScript = ({ googleAnalyticsId }) => (
+interface Props {
+  googleAnalyticsId: string
+}
+
+const GAScript = ({ googleAnalyticsId }: Props) => (
   <>
     <Script
       strategy="lazyOnload"
@@ -23,7 +27,8 @@ const GAScript = ({ googleAnalyticsId }) => (
 export default GAScript
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-export const logEvent = (action, category, label, value) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logEvent = (action: any, category: any, label: any, value: any) => {
   window.gtag?.('event', action, {
     event_category: category,
     event_label: label,
