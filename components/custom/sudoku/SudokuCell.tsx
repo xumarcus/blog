@@ -25,17 +25,21 @@ import styles from './SudokuCell.module.scss'
 
 const classNames = require('classnames')
 
-interface SudokuCellOnClickProps extends Coordinates {
+export interface SudokuCellOnMenuClickProps extends Coordinates {
   newValue: number | null
 }
 
 interface SudokuCellProps extends Coordinates {
-  onClick?: (props: SudokuCellOnClickProps) => void
+  onMenuClick?: (props: SudokuCellOnMenuClickProps) => void
   cellValue: CellValue
 }
 
-const SudokuCell = ({ onClick, cellValue, row, col }: SudokuCellProps) => {
+const SudokuCell = ({ onMenuClick, cellValue, row, col }: SudokuCellProps) => {
   const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null)
+  const handleMenuClick = (newValue: number | null) => {
+    onMenuClick?.({ newValue, row, col })
+    setAnchorEl(null)
+  }
   return (
     <>
       <SquareWrapper>
@@ -57,14 +61,7 @@ const SudokuCell = ({ onClick, cellValue, row, col }: SudokuCellProps) => {
           horizontal: 'right',
         }}
       >
-        <SudokuMenu
-          onClick={(newValue: number | null) => {
-            if (onClick) {
-              onClick({ newValue, row, col })
-            }
-            setAnchorEl(null)
-          }}
-        />
+        <SudokuMenu onMenuClick={handleMenuClick} />
       </Popover>
     </>
   )

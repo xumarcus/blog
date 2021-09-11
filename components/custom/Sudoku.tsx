@@ -17,7 +17,7 @@
 
 import { Alert } from '@material-ui/lab'
 import * as R from 'ramda'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CellGrid, { toIndex } from './CellGrid'
 import SudokuCell from './sudoku/SudokuCell'
 import styles from './Sudoku.module.scss'
@@ -27,23 +27,44 @@ export type CellValue = {
   isInput: boolean
 } | null
 
-const fromCellValue = (cellValue: CellValue) => (cellValue?.isInput ? cellValue.value : null)
-
 const toCellValue = (value: number | null, prev?: number | null) =>
   value ? { value, isInput: prev !== null } : null
 
-const Sudoku = () => {
-  const [values, setValues] = useState<CellValue[]>(
-    [1, 9, 8, 4, ...Array(77).fill(null)].map(toCellValue) // @test
-  )
-  const [hasError, setHasError] = useState(false)
+interface SudokuProps {
+  initialValues?: (number | null)[]
+}
+
+// Update rawValues => Re-render => (branch) postMessage to worker => worker returns inference => Update values => Rerender
+const Sudoku = ({ initialValues }: SudokuProps) => {
+  const definedInitialValues = initialValues ?? Array(81).fill(null)
+  const [rawValues, setRawValues] = useState<(number | null)[]>(definedInitialValues)
+  const [values, setValues] = useState<CellValue[]>(definedInitialValues.map(toCellValue))
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    setValues(rawValues.map(toCellValue))
+    if (window.Worker) {
+      const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
+      worker.postMessage(rawValues)
+      worker.onmessage = (event) => {
+        console.log(event.data)
+        if (event.data) {
+          setValues(R.zipWith(toCellValue)(event.data, rawValues))
+          setErrorMessage(null)
+        } else {
+          setErrorMessage(
+            'No solution found: numbers across each row, column and block should be unique.'
+          )
+        }
+      }
+    } else {
+      // Error handling
+    }
+  }, [rawValues])
+
   return (
     <>
-      {hasError && (
-        <Alert severity="error">
-          No solution found: numbers across each row, column and block should be unique.
-        </Alert>
-      )}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       <CellGrid<CellValue>
         className={styles.sudoku}
         values={values}
@@ -52,34 +73,9 @@ const Sudoku = () => {
         colCount={9}
         cellConstructor={(cellValue, row, col) => (
           <SudokuCell
-            onClick={(props) => {
-              const newValues = R.adjust(
-                toIndex(props, 9),
-                () => toCellValue(props.newValue),
-                values
-              )
-
-              // First render updated Sudoku
-              setValues(newValues)
-
-              // Then spawn background worker
-              if (window.Worker) {
-                const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
-                const cellValues = newValues.map(fromCellValue)
-                worker.postMessage(cellValues)
-                worker.onmessage = (event) => {
-                  if (event.data) {
-                    setValues(R.zipWith(toCellValue)(event.data, cellValues))
-                    setHasError(false)
-                  } else {
-                    setValues(newValues)
-                    setHasError(true)
-                  }
-                }
-              } else {
-                // Error handling
-              }
-            }}
+            onMenuClick={(props) =>
+              setRawValues(R.adjust(toIndex(props, 9), () => props.newValue, rawValues))
+            }
             cellValue={cellValue}
             row={row}
             col={col}

@@ -22,13 +22,13 @@ import CellGrid from '../CellGrid'
 import SquareWrapper from '../SquareWrapper'
 
 interface SudokuMenuProps {
-  onClick?: (newValue: number | null) => void
+  onMenuClick?: (newValue: number | null) => void
 }
 
 /**
  * SudokuMenu is inside Popover which is MaterialUI themed
  */
-const SudokuMenu = ({ onClick }: SudokuMenuProps) => (
+const SudokuMenu = ({ onMenuClick }: SudokuMenuProps) => (
   <div className="w-48">
     <CellGrid<number>
       values={R.range(1, 10)}
@@ -38,24 +38,14 @@ const SudokuMenu = ({ onClick }: SudokuMenuProps) => (
       cellConstructor={(value) => {
         return (
           <SquareWrapper>
-            <button
-              className="h-full w-full"
-              onClick={() => {
-                if (onClick) onClick(value)
-              }}
-            >
+            <button className="h-full w-full" onClick={() => onMenuClick?.(value)}>
               {value}
             </button>
           </SquareWrapper>
         )
       }}
     />
-    <Button
-      className="w-full"
-      onClick={() => {
-        if (onClick) onClick(null)
-      }}
-    >
+    <Button className="w-full" onClick={() => onMenuClick?.(null)}>
       Erase
     </Button>
   </div>

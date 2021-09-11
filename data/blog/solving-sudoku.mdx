@@ -8,4 +8,20 @@ images: []
 layout: PostLayout
 ---
 
-<Sudoku />
+<Sudoku
+  initialValues={
+    // https://github.com/xumarcus/sudoku/blob/8392698798747b6e24918be1e48cef1f04250239/tests/lib.rs#L158-L187
+    // prettier-ignore
+    [
+    null, null, null,    7, null, null, null, null, null,
+       1, null, null, null, null, null, null, null, null,
+    null, null, null,    4,    3, null,    2, null, null,
+    null, null, null, null, null, null, null, null,    6,
+    null, null, null,    5, null,    9, null, null, null,
+    null, null, null, null, null, null,    4,    1,    8,
+    null, null, null, null,    8,    1, null, null, null,
+    null, null,    2, null, null, null, null,    5, null,
+    null,    4, null, null, null, null,    3, null, null,
+    ]
+  }
+/>
