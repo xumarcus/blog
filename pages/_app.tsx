@@ -1,15 +1,22 @@
 import '@/css/tailwind.css'
 
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider as CSSThemeProvider, useTheme } from 'next-themes'
+import { themeOptionsLight, themeOptionsDark } from 'MUITheme'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 
 import Analytics from '@/components/analytics'
 import LayoutWrapper from '@/components/LayoutWrapper'
+import { createTheme, ThemeProvider as MUIThemeProvider } from '@material-ui/core'
 
-export default function App({ Component, pageProps }: AppProps) {
+const Inner = ({ Component, pageProps }: AppProps) => {
+  const { theme } = useTheme()
+
+  // Creates new theme per switch to force re-render
+  const themeOptions = theme === 'dark' ? themeOptionsDark : themeOptionsLight
+
   return (
-    <ThemeProvider attribute="class">
+    <MUIThemeProvider theme={createTheme(themeOptions)}>
       <Head>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
       </Head>
@@ -17,6 +24,14 @@ export default function App({ Component, pageProps }: AppProps) {
       <LayoutWrapper>
         <Component {...pageProps} />
       </LayoutWrapper>
-    </ThemeProvider>
+    </MUIThemeProvider>
+  )
+}
+
+export default function App(props: AppProps) {
+  return (
+    <CSSThemeProvider attribute="class">
+      <Inner {...props} />
+    </CSSThemeProvider>
   )
 }

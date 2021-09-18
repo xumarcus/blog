@@ -20,11 +20,6 @@ table.cellGrid {
   table-layout: fixed;
 
   td {
-    /* Is centering indices confusing?
-    display: table-cell;
-    vertical-align: middle;
-    */
-
     /* Tailwind first/last child padding */
     padding: 8px;
   }

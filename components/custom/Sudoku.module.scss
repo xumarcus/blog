@@ -23,11 +23,5 @@ table.sudoku {
   tr:nth-child(4),
   tr:nth-child(7) {
     border-top: solid;
-    /*
-    td:first-child,
-    td:last-child {
-       border-top: hidden; 
-    }
-    */
   }
 }

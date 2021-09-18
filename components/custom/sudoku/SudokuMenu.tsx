@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Button } from '@material-ui/core'
 import * as R from 'ramda'
 import React from 'react'
 import CellGrid from '../CellGrid'
 import SquareWrapper from '../SquareWrapper'
+import { Typography } from '@material-ui/core'
 
 interface SudokuMenuProps {
   onMenuClick?: (newValue: number | null) => void
@@ -39,15 +39,15 @@ const SudokuMenu = ({ onMenuClick }: SudokuMenuProps) => (
         return (
           <SquareWrapper>
             <button className="h-full w-full" onClick={() => onMenuClick?.(value)}>
-              {value}
+              <Typography>{value}</Typography>
             </button>
           </SquareWrapper>
         )
       }}
     />
-    <Button className="w-full" onClick={() => onMenuClick?.(null)}>
-      Erase
-    </Button>
+    <button className="w-full pb-4" onClick={() => onMenuClick?.(null)}>
+      <Typography>ERASE</Typography>
+    </button>
   </div>
 )
 

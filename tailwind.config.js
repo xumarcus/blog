@@ -1,8 +1,10 @@
 // @ts-check
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
+const defaultTheme = require('tailwindcss/defaultTheme')
+const forms = require('@tailwindcss/forms')
+const typography = require('@tailwindcss/typography')
 
 /** @type {import("tailwindcss/tailwind-config").TailwindConfig } */
 module.exports = {
@@ -163,5 +165,5 @@ module.exports = {
   variants: {
     typography: ['dark'],
   },
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+  plugins: [forms, typography],
 }

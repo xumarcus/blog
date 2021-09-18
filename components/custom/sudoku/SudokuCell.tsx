@@ -21,7 +21,6 @@ import SquareWrapper from '../SquareWrapper'
 import React, { useState } from 'react'
 import { CellValue } from '../Sudoku'
 import SudokuMenu from './SudokuMenu'
-import styles from './SudokuCell.module.scss'
 
 const classNames = require('classnames')
 
@@ -45,7 +44,7 @@ const SudokuCell = ({ onMenuClick, cellValue, row, col }: SudokuCellProps) => {
       <SquareWrapper>
         <button
           className={classNames('h-full', 'w-full', 'md:text-lg', 'lg:text-xl', {
-            [styles.notInput]: !cellValue?.isInput,
+            'opacity-50': !cellValue?.isInput,
           })}
           onClick={(event) => setAnchorEl(event.currentTarget)}
         >
