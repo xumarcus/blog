@@ -35,7 +35,7 @@ interface SudokuProps {
 }
 
 // Update rawValues => Re-render => (branch) postMessage to worker => worker returns inference => Update values => Rerender
-const Sudoku = ({ initialValues }: SudokuProps) => {
+const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuProps) => {
   const definedInitialValues = initialValues ?? Array(81).fill(null)
   const [rawValues, setRawValues] = useState<(number | null)[]>(definedInitialValues)
   const [values, setValues] = useState<CellValue[]>(definedInitialValues.map(toCellValue))
@@ -46,10 +46,9 @@ const Sudoku = ({ initialValues }: SudokuProps) => {
     if (window.Worker) {
       const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
       worker.postMessage(rawValues)
-      worker.onmessage = (event) => {
-        console.log(event.data)
-        if (event.data) {
-          setValues(R.zipWith(toCellValue)(event.data, rawValues))
+      worker.onmessage = ({ data }) => {
+        if (data) {
+          setValues(R.zipWith(toCellValue)(data, rawValues))
           setErrorMessage(null)
         } else {
           setErrorMessage(
