@@ -161,7 +161,6 @@ const countSetBits = (x: number) => {
 }
 
 const runBacktrack = (/* ref */ sudoku: Sudoku): Sudoku | null => {
-  console.log(sudoku)
   const t = sudoku.map((e, i) => [countSetBits(e), i, e]).filter(([setBits]) => setBits > 1)
   if (R.isEmpty(t)) {
     return sudoku
@@ -196,9 +195,7 @@ const work = ({ postValues, canBacktrack }: SudokuPostMessage): SudokuRecvMessag
   if (!enforceOn(sudoku)) return null
   const recvValues = sudoku.map(toCellValue)
   if (canBacktrack && recvValues.includes(null)) {
-    console.log(sudoku)
     const solution = runBacktrack(sudoku)
-    console.log(solution)
     return solution && { recvValues: solution.map(toCellValue), didBacktrack: true }
   } else {
     return { recvValues, didBacktrack: false }

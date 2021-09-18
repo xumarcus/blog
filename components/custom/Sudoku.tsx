@@ -33,10 +33,6 @@ export type SudokuRawValue = number | null
 const toCellValue = (value: SudokuRawValue, prev?: SudokuRawValue) =>
   value ? { value, isInput: prev !== null } : null
 
-interface SudokuProps {
-  initialValues?: SudokuRawValue[]
-}
-
 export interface SudokuPostMessage {
   postValues: SudokuRawValue[]
   canBacktrack: boolean
@@ -47,63 +43,95 @@ export type SudokuRecvMessage = {
   didBacktrack: boolean
 } | null
 
-// Update rawValues => Re-render => (branch) postMessage to worker => worker returns inference => Update values => Rerender
-const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuProps) => {
-  const definedInitialValues = initialValues ?? Array(81).fill(null)
-  const [postValues, setPostValues] = useState<SudokuRawValue[]>(definedInitialValues)
-  const [values, setValues] = useState<CellValue[]>(definedInitialValues.map(toCellValue))
-  const [message, setMessage] = useState<{ type: Color; body: string } | null>(null)
-  const [canBacktrack, setCanBacktrack] = useState(false)
+type SudokuAlertMessage = {
+  type: Color
+  body: string
+} | null
+
+interface SudokuInnerProps {
+  postValues: SudokuRawValue[]
+  canBacktrack: boolean
+  showHints: boolean
+  handleCanBacktrackChange?: (checked: boolean) => void
+  handleShowHintsChange?: (checked: boolean) => void
+  handleMenuClick?: (index: number, newValue: SudokuRawValue) => void
+}
+
+const SudokuInner = ({
+  postValues,
+  canBacktrack,
+  showHints,
+  handleCanBacktrackChange,
+  handleShowHintsChange,
+  handleMenuClick,
+}: SudokuInnerProps) => {
+  const [values, setValues] = useState<CellValue[]>(postValues.map(toCellValue))
+  const [message, setMessage] = useState<SudokuAlertMessage>(null)
 
   useEffect(() => {
+    const handleRecvMessage = (data: SudokuRecvMessage, t0: number): SudokuAlertMessage => {
+      if (data) {
+        const { recvValues, didBacktrack } = data
+        setValues(R.zipWith(toCellValue)(recvValues, postValues))
+        if (recvValues.includes(null)) {
+          console.assert(!canBacktrack)
+          return {
+            type: 'info',
+            body: 'There may be a full solution. Turn on backtracking?',
+          }
+        }
+        if (!didBacktrack) return null
+        return {
+          type: 'success',
+          body: `Solution found with backtracking in ${(performance.now() - t0) | 0}ms.`,
+        }
+      }
+      return {
+        type: 'error',
+        body: 'No solution found. Are digits across each row, column and block unique?',
+      }
+    }
+
     setValues(postValues.map(toCellValue))
     if (window.Worker) {
       const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
+      const t0 = performance.now()
       worker.postMessage({ postValues, canBacktrack })
-      worker.onmessage = ({ data }) => {
-        if (data) {
-          const { recvValues, didBacktrack } = data
-          setValues(R.zipWith(toCellValue)(recvValues, postValues))
-          if (didBacktrack) {
-            setMessage({
-              type: 'success',
-              body: 'Solution found after backtracking.',
-            })
-          } else {
-            setMessage(null)
-          }
-        } else {
-          if (canBacktrack) {
-            setMessage({
-              type: 'error',
-              body: 'No solution found. Are digits across each row, column and block unique?',
-            })
-          } else {
-            setMessage({
-              type: 'info',
-              body: 'No solution found. Did you turn on backtracking?',
-            })
-          }
-        }
-      }
+      worker.onmessage = ({ data }) => setMessage(handleRecvMessage(data, t0))
     } else {
       setMessage({
         type: 'error',
         body: 'Your browser does not support WebWorker.',
       })
     }
-  }, [canBacktrack, postValues])
+  }, [postValues, canBacktrack])
 
   return (
     <>
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row">
         <FormControlLabel
           control={
-            <Switch checked={canBacktrack} onChange={(e) => setCanBacktrack(e.target.checked)} />
+            <Switch
+              checked={canBacktrack}
+              onChange={(event) => handleCanBacktrackChange?.(event.target.checked)}
+            />
           }
           label="Backtracking"
         />
-        {message && <Alert severity={message.type}>{message.body}</Alert>}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showHints}
+              onChange={(event) => handleShowHintsChange?.(event.target.checked)}
+            />
+          }
+          label="Show Hints"
+        />
+        {message && (
+          <Alert className="ml-auto" severity={message.type}>
+            {message.body}
+          </Alert>
+        )}
       </div>
       <CellGrid<CellValue>
         className={styles.sudoku}
@@ -113,9 +141,8 @@ const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuP
         colCount={9}
         cellConstructor={(cellValue, row, col) => (
           <SudokuCell
-            onMenuClick={(props) =>
-              setPostValues(R.adjust(toIndex(props, 9), () => props.newValue, postValues))
-            }
+            onMenuClick={(props) => handleMenuClick?.(toIndex(props, 9), props.newValue)}
+            showHints={showHints}
             cellValue={cellValue}
             row={row}
             col={col}
@@ -123,6 +150,36 @@ const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuP
         )}
       />
     </>
+  )
+}
+
+interface SudokuProps {
+  digits?: number[]
+  initCanBacktrack?: boolean
+  initShowHints?: boolean
+}
+
+const Sudoku: React.FunctionComponent<SudokuProps> = ({
+  digits,
+  initCanBacktrack,
+  initShowHints,
+}: SudokuProps) => {
+  const [postValues, setPostValues] = useState<SudokuRawValue[]>(
+    digits?.map((x) => (1 <= x && x <= 9 ? x : null)) ?? Array(81).fill(null)
+  )
+  const [canBacktrack, setCanBacktrack] = useState(initCanBacktrack)
+  const [showHints, setShowHints] = useState(initShowHints)
+  return (
+    <SudokuInner
+      postValues={postValues}
+      canBacktrack={Boolean(canBacktrack)}
+      showHints={Boolean(showHints)}
+      handleCanBacktrackChange={setCanBacktrack}
+      handleShowHintsChange={setShowHints}
+      handleMenuClick={(index, newValue) =>
+        setPostValues(R.adjust(index, () => newValue, postValues))
+      }
+    />
   )
 }
 

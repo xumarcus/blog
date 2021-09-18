@@ -30,10 +30,11 @@ export interface SudokuCellOnMenuClickProps extends Coordinates {
 
 interface SudokuCellProps extends Coordinates {
   onMenuClick?: (props: SudokuCellOnMenuClickProps) => void
+  showHints: boolean
   cellValue: CellValue
 }
 
-const SudokuCell = ({ onMenuClick, cellValue, row, col }: SudokuCellProps) => {
+const SudokuCell = ({ onMenuClick, showHints, cellValue, row, col }: SudokuCellProps) => {
   const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null)
   const handleMenuClick = (newValue: number | null) => {
     onMenuClick?.({ newValue, row, col })
@@ -44,7 +45,7 @@ const SudokuCell = ({ onMenuClick, cellValue, row, col }: SudokuCellProps) => {
       <SquareWrapper>
         <button
           className={classNames('h-full', 'w-full', 'md:text-lg', 'lg:text-xl', {
-            'opacity-50': !cellValue?.isInput,
+            [showHints ? 'opacity-50' : 'opacity-0']: !cellValue?.isInput,
           })}
           onClick={(event) => setAnchorEl(event.currentTarget)}
         >
