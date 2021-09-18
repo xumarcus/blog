@@ -16,6 +16,7 @@
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
 import * as R from 'ramda'
+import { SudokuPostMessage, SudokuRecvMessage } from '../Sudoku'
 
 // Constants
 
@@ -46,6 +47,7 @@ type CellConstraints = number
 // Alias
 type Index = number
 type DomainValue = number
+type Sudoku = CellConstraints[]
 type Matching = Map<Index, DomainValue>
 type ReversedMatching = Map<DomainValue, Index>
 
@@ -65,27 +67,11 @@ const LOG2P1 = new Map<CellConstraints, DomainValue>([
 
 const fromCellValue = (cellValue: CellValue) => (cellValue !== null ? (1 << cellValue) >> 1 : 0x1ff)
 const toCellValue = (cellConstraints: CellConstraints) => {
-  if (!cellConstraints) throw new Error('Cell must have at least one option')
+  console.assert(cellConstraints)
   return LOG2P1.get(cellConstraints) ?? null
 }
 
-/**
- * Core algorithm
- * Ref: https://github.com/xumarcus/sudoku/blob/master/src/lib.rs
- * This is a Typescript port that supports single solution only. The lack of optimization is deliberate,
- * since it takes around ~20ms to solve a single instance (significant slower than state-of-the-art that
- * focus on pattern matching strategies), and that version is also much harder to understand. Note that
- * this does not use Hopcroft-Karp which is theoretically faster (there's a paper describing how to shave
- * off another O(N = 3) off the solver): it is not known whether the added complexity is worth it.
- */
-const solve = (data: CellValue[]): CellValue[] | null => {
-  console.assert(data.length === N4)
-  const /* mut */ sudoku = data.map(fromCellValue)
-  if (!enforceOn(sudoku)) return null
-  return sudoku.map(toCellValue)
-}
-
-const enforceOn = (/* mut */ sudoku: CellConstraints[], index?: number): boolean => {
+const enforceOn = (/* mut */ sudoku: Sudoku, index?: number): boolean => {
   const /* mut */ queue = index !== undefined ? [index] : SPAN // Suboptimal
 
   // eslint-disable-next-line no-constant-condition
@@ -101,7 +87,7 @@ const enforceOn = (/* mut */ sudoku: CellConstraints[], index?: number): boolean
 
 const enforce = (
   indices: number[],
-  /* mut */ sudoku: CellConstraints[],
+  /* mut */ sudoku: Sudoku,
   /* mut */ queue: number[]
 ): boolean => {
   const buf = indices.map((index) => sudoku[index])
@@ -167,5 +153,57 @@ const pruneBuf = (buf: CellConstraints[]): CellConstraints[] | null => {
   return prunedBuf
 }
 
+const countSetBits = (x: number) => {
+  x = (x | 0) - ((x >> 1) & 0x55555555)
+  x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
+  x = (x + (x >> 4)) & 0x0f0f0f0f
+  return (x * 0x01010101) >> 24
+}
+
+const runBacktrack = (/* ref */ sudoku: Sudoku): Sudoku | null => {
+  console.log(sudoku)
+  const t = sudoku.map((e, i) => [countSetBits(e), i, e]).filter(([setBits]) => setBits > 1)
+  if (R.isEmpty(t)) {
+    return sudoku
+  }
+  const [_, index, cellConstraints] = t.reduce(R.min)
+  for (const domainValue of R.range(1, N2 + 1)) {
+    const bitmask = (1 << domainValue) >> 1
+    if (bitmask & cellConstraints) {
+      const /* mut */ guess = R.adjust(index, () => bitmask, sudoku)
+      const solution = enforceOn(guess, index) && runBacktrack(guess)
+      if (solution) {
+        return solution
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * Core algorithm
+ * Ref: https://github.com/xumarcus/sudoku/blob/master/src/lib.rs
+ * This is a Typescript port that supports single solution only. This means we
+ * can skip some ugly optimizations in the original version. Anyway, this is
+ * significant slower than state-of-the-art that focus on pattern matching
+ * strategies. Note that this does not use Hopcroft-Karp which is theoretically
+ * faster (there's a paper describing how to shave off another O(N = 3) off the
+ * solver). Is the extra complexity worth it?
+ */
+const work = ({ postValues, canBacktrack }: SudokuPostMessage): SudokuRecvMessage => {
+  console.assert(postValues.length === N4)
+  const /* mut */ sudoku = postValues.map(fromCellValue)
+  if (!enforceOn(sudoku)) return null
+  const recvValues = sudoku.map(toCellValue)
+  if (canBacktrack && recvValues.includes(null)) {
+    console.log(sudoku)
+    const solution = runBacktrack(sudoku)
+    console.log(solution)
+    return solution && { recvValues: solution.map(toCellValue), didBacktrack: true }
+  } else {
+    return { recvValues, didBacktrack: false }
+  }
+}
+
 // Required for Web Worker
-onmessage = ({ data }) => postMessage(solve(data))
+onmessage = ({ data }) => postMessage(work(data))

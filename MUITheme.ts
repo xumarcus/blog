@@ -116,10 +116,14 @@ export const themeOptionsLight: ThemeOptions = {
     type: 'light',
     primary: colors.trueGray,
     error: colors.red,
+    info: colors.blue,
   },
-  typography: {
+  typography: (palette) => ({
     fontFamily: '"Inter", sans-serif',
-  },
+    allVariants: {
+      color: palette.primary.dark,
+    },
+  }),
 }
 
 export const themeOptionsDark: ThemeOptions = {
@@ -128,6 +132,7 @@ export const themeOptionsDark: ThemeOptions = {
     type: 'dark',
     primary: colors.trueGray,
     error: colors.red,
+    info: colors.blue,
     background: {
       default: colors.trueGray[800],
       paper: colors.trueGray[800],

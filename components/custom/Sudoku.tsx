@@ -15,55 +15,96 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Alert } from '@material-ui/lab'
+import { Alert, Color } from '@material-ui/lab'
 import * as R from 'ramda'
 import React, { useEffect, useState } from 'react'
 import CellGrid, { toIndex } from './CellGrid'
 import SudokuCell from './sudoku/SudokuCell'
 import styles from './Sudoku.module.scss'
+import { FormControlLabel, Switch } from '@material-ui/core'
 
 export type CellValue = {
   value: number
   isInput: boolean
 } | null
 
-const toCellValue = (value: number | null, prev?: number | null) =>
+export type SudokuRawValue = number | null
+
+const toCellValue = (value: SudokuRawValue, prev?: SudokuRawValue) =>
   value ? { value, isInput: prev !== null } : null
 
 interface SudokuProps {
-  initialValues?: (number | null)[]
+  initialValues?: SudokuRawValue[]
 }
+
+export interface SudokuPostMessage {
+  postValues: SudokuRawValue[]
+  canBacktrack: boolean
+}
+
+export type SudokuRecvMessage = {
+  recvValues: SudokuRawValue[]
+  didBacktrack: boolean
+} | null
 
 // Update rawValues => Re-render => (branch) postMessage to worker => worker returns inference => Update values => Rerender
 const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuProps) => {
   const definedInitialValues = initialValues ?? Array(81).fill(null)
-  const [rawValues, setRawValues] = useState<(number | null)[]>(definedInitialValues)
+  const [postValues, setPostValues] = useState<SudokuRawValue[]>(definedInitialValues)
   const [values, setValues] = useState<CellValue[]>(definedInitialValues.map(toCellValue))
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<{ type: Color; body: string } | null>(null)
+  const [canBacktrack, setCanBacktrack] = useState(false)
 
   useEffect(() => {
-    setValues(rawValues.map(toCellValue))
+    setValues(postValues.map(toCellValue))
     if (window.Worker) {
       const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
-      worker.postMessage(rawValues)
+      worker.postMessage({ postValues, canBacktrack })
       worker.onmessage = ({ data }) => {
         if (data) {
-          setValues(R.zipWith(toCellValue)(data, rawValues))
-          setErrorMessage(null)
+          const { recvValues, didBacktrack } = data
+          setValues(R.zipWith(toCellValue)(recvValues, postValues))
+          if (didBacktrack) {
+            setMessage({
+              type: 'success',
+              body: 'Solution found after backtracking.',
+            })
+          } else {
+            setMessage(null)
+          }
         } else {
-          setErrorMessage(
-            'No solution found: numbers across each row, column and block should be unique.'
-          )
+          if (canBacktrack) {
+            setMessage({
+              type: 'error',
+              body: 'No solution found. Are digits across each row, column and block unique?',
+            })
+          } else {
+            setMessage({
+              type: 'info',
+              body: 'No solution found. Did you turn on backtracking?',
+            })
+          }
         }
       }
     } else {
-      // Error handling
+      setMessage({
+        type: 'error',
+        body: 'Your browser does not support WebWorker.',
+      })
     }
-  }, [rawValues])
+  }, [canBacktrack, postValues])
 
   return (
     <>
-      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+      <div className="flex flex-row justify-between">
+        <FormControlLabel
+          control={
+            <Switch checked={canBacktrack} onChange={(e) => setCanBacktrack(e.target.checked)} />
+          }
+          label="Backtracking"
+        />
+        {message && <Alert severity={message.type}>{message.body}</Alert>}
+      </div>
       <CellGrid<CellValue>
         className={styles.sudoku}
         values={values}
@@ -73,7 +114,7 @@ const Sudoku: React.FunctionComponent<SudokuProps> = ({ initialValues }: SudokuP
         cellConstructor={(cellValue, row, col) => (
           <SudokuCell
             onMenuClick={(props) =>
-              setRawValues(R.adjust(toIndex(props, 9), () => props.newValue, rawValues))
+              setPostValues(R.adjust(toIndex(props, 9), () => props.newValue, postValues))
             }
             cellValue={cellValue}
             row={row}
