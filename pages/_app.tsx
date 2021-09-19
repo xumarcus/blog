@@ -1,32 +1,26 @@
 import '@/css/tailwind.css'
 
-import { ThemeProvider as CSSThemeProvider, useTheme } from 'next-themes'
-import { themeOptionsLight, themeOptionsDark } from 'MUITheme'
+import { ThemeProvider as CSSThemeProvider } from 'next-themes'
+import { themeOptionsLight, themeOptionsDark, useCurrentTheme } from '@/lib/utils/muiTheme'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 
 import Analytics from '@/components/analytics'
 import LayoutWrapper from '@/components/LayoutWrapper'
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material'
+import { useEffect, useState } from 'react'
 
 const Inner = ({ Component, pageProps }: AppProps) => {
-  const { theme, resolvedTheme } = useTheme()
-  const currentTheme = (() => {
-    switch (theme) {
-      case 'light':
-        return 'light'
-      case 'dark':
-        return 'dark'
-      case 'system':
-      default:
-        return resolvedTheme
-    }
-  })()
+  const [mounted, setMounted] = useState(false)
+  const currentTheme = useCurrentTheme()
+
+  // When mounted on client, now we can show the UI
+  useEffect(() => setMounted(true), [])
 
   // Creates new theme per switch to force re-render
   const themeOptions = currentTheme === 'dark' ? themeOptionsDark : themeOptionsLight
 
-  return (
+  return mounted ? (
     <MUIThemeProvider theme={createTheme(themeOptions)}>
       <Head>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -36,7 +30,7 @@ const Inner = ({ Component, pageProps }: AppProps) => {
         <Component {...pageProps} />
       </LayoutWrapper>
     </MUIThemeProvider>
-  )
+  ) : null
 }
 
 export default function App(props: AppProps) {

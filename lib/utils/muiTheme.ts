@@ -55,6 +55,7 @@ type TailwindColors = {
 const colors: TailwindColors = require('tailwindcss/colors')
 
 import { Breakpoints, ThemeOptions } from '@mui/material/styles'
+import { useTheme } from 'next-themes'
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
     xs: false
@@ -112,4 +113,17 @@ export const themeOptionsDark: ThemeOptions = {
       color: palette.primary.light,
     },
   }),
+}
+
+export const useCurrentTheme = () => {
+  const { theme, resolvedTheme } = useTheme()
+  switch (theme) {
+    case 'light':
+      return 'light'
+    case 'dark':
+      return 'dark'
+    case 'system':
+    default:
+      return resolvedTheme
+  }
 }

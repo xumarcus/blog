@@ -1,20 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { useCurrentTheme } from '@/lib/utils/muiTheme'
 
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false)
-  const { theme, setTheme, resolvedTheme } = useTheme()
-  const currentTheme = (() => {
-    switch (theme) {
-      case 'light':
-        return 'light'
-      case 'dark':
-        return 'dark'
-      case 'system':
-      default:
-        return resolvedTheme
-    }
-  })()
+  const { setTheme } = useTheme()
+  const currentTheme = useCurrentTheme()
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), [])
