@@ -17,7 +17,7 @@
 
 import * as R from 'ramda'
 import React, { HTMLAttributes } from 'react'
-import { Table } from '@material-ui/core'
+import { Table } from '@mui/material'
 import styles from './CellGrid.module.scss'
 
 export interface Coordinates {

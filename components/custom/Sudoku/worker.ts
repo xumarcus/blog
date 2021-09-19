@@ -16,7 +16,7 @@
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
 import * as R from 'ramda'
-import { SudokuPostMessage, SudokuRecvMessage } from '../Sudoku'
+import { SudokuPostMessage, SudokuRecvMessage } from '.'
 
 // Constants
 

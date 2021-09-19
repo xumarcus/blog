@@ -7,7 +7,7 @@ import Head from 'next/head'
 
 import Analytics from '@/components/analytics'
 import LayoutWrapper from '@/components/LayoutWrapper'
-import { createTheme, ThemeProvider as MUIThemeProvider } from '@material-ui/core'
+import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material'
 
 const Inner = ({ Component, pageProps }: AppProps) => {
   const { theme } = useTheme()

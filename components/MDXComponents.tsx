@@ -4,8 +4,7 @@ import CustomLink from './Link'
 import Image from './Image'
 import Pre from './Pre'
 import TOCInline from './TOCInline'
-import SimpleLineChart from './custom/SimpleLineChart'
-import Sudoku from './custom/Sudoku'
+import * as Custom from './custom'
 
 const Wrapper: React.FunctionComponent<{ layout: string }> = ({ layout, ...rest }) => {
   const Layout = require(`../layouts/${layout}`).default
@@ -19,12 +18,7 @@ export const MDXComponents: ComponentMap = {
   pre: Pre,
   toc: TOCInline,
   wrapper: Wrapper,
-
-  // Custom
-  SimpleLineChart,
-  Sudoku,
-
-  // Library imports
+  ...Custom,
 }
 
 interface Props {

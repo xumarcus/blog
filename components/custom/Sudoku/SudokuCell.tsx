@@ -16,10 +16,10 @@
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Coordinates } from '../CellGrid'
-import { Popover } from '@material-ui/core'
+import { Popover } from '@mui/material'
 import SquareWrapper from '../SquareWrapper'
 import React, { useState } from 'react'
-import { CellValue } from '../Sudoku'
+import { CellValue } from '.'
 import SudokuMenu from './SudokuMenu'
 
 const classNames = require('classnames')

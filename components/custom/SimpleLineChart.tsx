@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
+import { HTMLAttributes } from 'react'
 import {
   Label,
   LineChart,
@@ -28,20 +29,14 @@ import {
   TooltipProps,
 } from 'recharts'
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   data: [string, number][]
   formatter?: TooltipProps<number, string>['formatter']
   name: string
   title?: string
 }
 
-// Explicitly typing `React.FunctionComponent<Props>` is a hack for `MDXComponents.tsx`
-const SimpleLineChart: React.FunctionComponent<Props> = ({
-  data,
-  formatter,
-  name,
-  title,
-}: Props) => (
+const SimpleLineChart = ({ data, formatter, name, title }: Props) => (
   <>
     {title && (
       <ResponsiveContainer width="100%">

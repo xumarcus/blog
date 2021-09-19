@@ -19,7 +19,7 @@ import * as R from 'ramda'
 import React from 'react'
 import CellGrid from '../CellGrid'
 import SquareWrapper from '../SquareWrapper'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 interface SudokuMenuProps {
   onMenuClick?: (newValue: number | null) => void

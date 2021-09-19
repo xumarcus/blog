@@ -45,6 +45,7 @@ type TailwindColorName =
   | 'coolGray'
   | 'blueGray'
 
+import { TailwindColorGroup } from 'tailwindcss/tailwind-config'
 type TailwindColors = {
   [color in TailwindColorName]: TailwindColorGroup
 } & {
@@ -53,44 +54,11 @@ type TailwindColors = {
 }
 const colors: TailwindColors = require('tailwindcss/colors')
 
-/*
-const inverseColor = (color: TailwindColorGroup): TailwindColorGroup => ({
-  50: colors.black,
-  100: color[900],
-  200: color[800],
-  300: color[700],
-  400: color[600],
-  500: color[500],
-  600: color[400],
-  700: color[300],
-  800: color[200],
-  900: color[100],
-})
-*/
-
-import { BreakpointOverrides, Breakpoints } from '@material-ui/core/styles/createBreakpoints'
-declare module '@material-ui/core/styles/createBreakpoints' {
+import { Breakpoints, ThemeOptions } from '@mui/material/styles'
+declare module '@mui/material/styles' {
   interface BreakpointOverrides {
     xs: false
     '2xl': true
-  }
-}
-
-import { ThemeOptions } from '@material-ui/core/styles/createTheme'
-import { TailwindColorGroup } from 'tailwindcss/tailwind-config'
-declare module '@material-ui/core/styles/createTheme' {
-  interface Theme {
-    appDrawer: {
-      width: React.CSSProperties['width']
-      breakpoint: BreakpointOverrides
-    }
-  }
-  // allow configuration using `createMuiTheme`
-  interface ThemeOptions {
-    appDrawer?: {
-      width?: React.CSSProperties['width']
-      breakpoint?: BreakpointOverrides
-    }
   }
 }
 
@@ -113,7 +81,7 @@ const breakpoints: Partial<
 export const themeOptionsLight: ThemeOptions = {
   breakpoints,
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: colors.trueGray,
     error: colors.red,
     info: colors.blue,
@@ -129,14 +97,10 @@ export const themeOptionsLight: ThemeOptions = {
 export const themeOptionsDark: ThemeOptions = {
   breakpoints,
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: colors.trueGray,
     error: colors.red,
     info: colors.blue,
-    background: {
-      default: colors.trueGray[800],
-      paper: colors.trueGray[800],
-    },
   },
   typography: (palette) => ({
     fontFamily: '"Inter", sans-serif',

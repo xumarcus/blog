@@ -12,7 +12,7 @@ Sudoku is a well-known NP-complete problem. The rules are simple:
 
 > Fill a 9 × 9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid (also called "boxes", "blocks", or "regions") contain all of the digits from 1 to 9.
 
-With insufficient clues, multiple solutions can exist. As an extreme example, this Sudoku has no clues and has 6,670,903,752,021,072,936,960 solutions.
+With insufficient clues, multiple solutions can exist. As an extreme example, this Sudoku has no clues and has `6,670,903,752,021,072,936,960` solutions.
 
 > Click on the cells to add or remove clues.
 
@@ -24,7 +24,7 @@ Most of the time though, the puzzle setter should provide a partially completed 
 
 <Sudoku
   digits={
-    // https://github.com/xumarcus/sudoku/blob/8392698798747b6e24918be1e48cef1f04250239/tests/lib.rs#L158-L187
+    //
     // prettier-ignore
     [
       0, 0, 0, 7, 0, 0, 0, 0, 0,
@@ -40,6 +40,8 @@ Most of the time though, the puzzle setter should provide a partially completed 
   }
 />
 
+# Sudoku as a CSP
+
 More formally, Sudoku can be viewed as a constraint satisfaction problem (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. This is an example of a 2-SAT,
 
 ```python
@@ -48,35 +50,38 @@ More formally, Sudoku can be viewed as a constraint satisfaction problem (CSP), 
 
 in which you need to find an assignment for which `SAT` evaluates to `true` (such as `SAT(1, 0, 1, 0)`). There are known linear time algorithms for 2-SAT. Consider an (implication) graph where the nodes are `x1 = 0, x1 = 1, x2 = 0, x2 = 1, x3 = 0, x3 = 1, x4 = 0, x4 = 1` and the (directed) edges represent implications. For instance, since `x1 = 1 => x3 = 1` in the above example, you can draw an edge from `x1 = 1` to `x3 = 1`. Then if mutually exclusive outcomes (`x1 = 0` and `x1 = 1`) are in the same strongly connected component of the graph, that formula is not satisfiable.
 
-In a similar fashion, Sudoku clues can imply what values which cell has to be. Consider this puzzle,
-
-<Sudoku
-  digits={
-    // prettier-ignore
-    [
-      0, 0, 0, 0, 0, 0, 0, 0, 0,
-      1, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 4, 3, 0, 2, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 6,
-      0, 0, 0, 5, 0, 9, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 4, 1, 8,
-      0, 0, 0, 0, 8, 1, 0, 0, 0,
-      0, 0, 2, 0, 0, 0, 0, 5, 0,
-      0, 4, 0, 0, 0, 0, 3, 0, 0,
-    ]
-  }
-  initShowHints
-/>
-
-The (greyed out) `5` in _g4_ can be deduced using local constraints alone, by observing that no other `5` can reside in the _5_-th row and the _h_-column, yet the block that _g4_ belongs to must contain exactly one `5`.
-
 Before we continue, let us revisit **P** and **NP**:
 
 - If you can _find_ a solution in polynomial time, the problem is said to be in **P**.
 - If you can _verify_ a solution in polynomial time, the problem is said to be in **NP**.
 - Intuitive speaking, you can _find_ a solution to an **NP** problem in _non-deterministic_ polynomial time by _verifying_ all solutions in polynomial time using a _infinitely_ parallel computer.
 
-Unfortunately, while 2-SAT is in **P**, Sudoku is **NP** but not (known to be) **P**. Consider this puzzle from [Arto Inkala](https://www.linkedin.com/in/arto-inkala-9651485a), which is one of the _hardest_ known Sudoku puzzles. No cells can be deduced using local constraints alone.
+Unfortunately, while 2-SAT is in **P**, Sudoku is **NP** but not (known to be) **P**, even though most of the time Sudoku clues can imply what values which cell has to be in a similar fashion with 2-SAT. Consider the previous puzzle (with the `7` in _d1_ removed, for sake of brevity),
+
+<Panel summary="Example">
+  <Sudoku
+    digits={
+      // https://github.com/xumarcus/sudoku/blob/8392698798747b6e24918be1e48cef1f04250239/tests/lib.rs#L158-L187
+      // prettier-ignore
+      [
+          0, 0, 0, 0, 0, 0, 0, 0, 0,
+          1, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 4, 3, 0, 2, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 6,
+          0, 0, 0, 5, 0, 9, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 4, 1, 8,
+          0, 0, 0, 0, 8, 1, 0, 0, 0,
+          0, 0, 2, 0, 0, 0, 0, 5, 0,
+          0, 4, 0, 0, 0, 0, 3, 0, 0,
+        ]
+    }
+    initShowHints
+  />
+</Panel>
+
+We can deduce the `5` in _g4_ by observing that no other `5` can reside in the _h_-column and the _5_-th row, yet the block that _g4_ belongs to must contain exactly one `5`.
+
+On the other hand, consider this puzzle from [Arto Inkala](https://www.linkedin.com/in/arto-inkala-9651485a), which is one of the _hardest_ known Sudoku puzzles that have a _unique_ solution.
 
 > Turn on **Backtracking** to solve the puzzle.
 
@@ -98,3 +103,38 @@ Unfortunately, while 2-SAT is in **P**, Sudoku is **NP** but not (known to be) *
   }
   initShowHints
 />
+
+In this case, our algorithm has to make a (educated) guess on a cell's value, reject permutations that are not _consistent_ with the new value, and rinse and repeat until no cells are empty, at which point the algorithm terminates with the solution found. However, if there are cells to which we can't assign a _consistent_ value, we have to reject our latest guess and move on to another guess. This brute force algorithm is commonly known as **backtracking**. For maximum efficiency, a Sudoku solver should balance the number of guesses made and the time it takes to check if the guess is _consistent_.
+
+# Local consistency
+
+Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. This is where the notion of _local consistency_ comes into play. Local consistency can be classified as:
+
+- _Node consistency_ restricts a variable's domain to which that satisfies unary constraints. See [here](#sudoku-as-a-csp) for an example.
+
+- _(generalized) Arc consistency_ restricts a variable's domain to which that a valid assignment _exists_ for a particular constraint. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _d5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
+
+<Panel summary="Example">
+  <Sudoku
+    digits={
+      // http://hodoku.sourceforge.net/en/tech_naked.php
+      // prettier-ignore
+      [
+        0, 0, 7, 0, 0, 4, 0, 2, 0,
+        0, 0, 0, 0, 0, 2, 6, 0, 0,
+        0, 4, 0, 0, 5, 6, 0, 7, 8,
+        3, 1, 0, 0, 0, 7, 2, 4, 0,
+        0, 0, 0, 0, 0, 0, 3, 0, 5,
+        0, 0, 0, 0, 6, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+      ]
+    }
+    initShowHints
+  />
+</Panel>
+
+Notice that if an assignment of variables is _arc-consistent_, that assignment is _node-consistent_ for all variables included in the constraint. _Arc-consistent_ assignments therefore form a subset of _node-consistent_ assignments.
+
+# Implementing the solver

@@ -15,13 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with blog.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Alert, Color } from '@material-ui/lab'
 import * as R from 'ramda'
-import React, { useEffect, useState } from 'react'
-import CellGrid, { toIndex } from './CellGrid'
-import SudokuCell from './sudoku/SudokuCell'
-import styles from './Sudoku.module.scss'
-import { FormControlLabel, Switch } from '@material-ui/core'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
+import CellGrid, { toIndex } from '../CellGrid'
+import SudokuCell from './SudokuCell'
+import styles from './index.module.scss'
+import { Alert, AlertColor, FormControlLabel, Switch } from '@mui/material'
 
 export type CellValue = {
   value: number
@@ -44,7 +43,7 @@ export type SudokuRecvMessage = {
 } | null
 
 type SudokuAlertMessage = {
-  type: Color
+  type: AlertColor
   body: string
 } | null
 
@@ -94,7 +93,7 @@ const SudokuInner = ({
 
     setValues(postValues.map(toCellValue))
     if (window.Worker) {
-      const worker = new Worker(new URL('./sudoku/worker.ts', import.meta.url))
+      const worker = new Worker(new URL('./worker.ts', import.meta.url))
       const t0 = performance.now()
       worker.postMessage({ postValues, canBacktrack })
       worker.onmessage = ({ data }) => setMessage(handleRecvMessage(data, t0))
@@ -108,7 +107,7 @@ const SudokuInner = ({
 
   return (
     <>
-      <div className="flex flex-row">
+      <div className="flex flex-row flex-wrap">
         <FormControlLabel
           control={
             <Switch
@@ -153,17 +152,13 @@ const SudokuInner = ({
   )
 }
 
-interface SudokuProps {
+interface SudokuProps extends HTMLAttributes<HTMLDivElement> {
   digits?: number[]
   initCanBacktrack?: boolean
   initShowHints?: boolean
 }
 
-const Sudoku: React.FunctionComponent<SudokuProps> = ({
-  digits,
-  initCanBacktrack,
-  initShowHints,
-}: SudokuProps) => {
+const Sudoku = ({ digits, initCanBacktrack, initShowHints }: SudokuProps) => {
   const [postValues, setPostValues] = useState<SudokuRawValue[]>(
     digits?.map((x) => (1 <= x && x <= 9 ? x : null)) ?? Array(81).fill(null)
   )
