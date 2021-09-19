@@ -78,13 +78,19 @@ const breakpoints: Partial<
   },
 }
 
+const tailwindPalette = {
+  primary: colors.trueGray,
+  error: colors.red,
+  info: colors.blue,
+  success: colors.green,
+  warning: colors.yellow,
+}
+
 export const themeOptionsLight: ThemeOptions = {
   breakpoints,
   palette: {
     mode: 'light',
-    primary: colors.trueGray,
-    error: colors.red,
-    info: colors.blue,
+    ...tailwindPalette,
   },
   typography: (palette) => ({
     fontFamily: '"Inter", sans-serif',
@@ -98,9 +104,7 @@ export const themeOptionsDark: ThemeOptions = {
   breakpoints,
   palette: {
     mode: 'dark',
-    primary: colors.trueGray,
-    error: colors.red,
-    info: colors.blue,
+    ...tailwindPalette,
   },
   typography: (palette) => ({
     fontFamily: '"Inter", sans-serif',

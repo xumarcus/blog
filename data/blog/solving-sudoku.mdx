@@ -14,13 +14,13 @@ Sudoku is a well-known NP-complete problem. The rules are simple:
 
 With insufficient clues, multiple solutions can exist. As an extreme example, this Sudoku has no clues and has `6,670,903,752,021,072,936,960` solutions.
 
-> Click on the cells to add or remove clues.
+<Alert severity="info">Click on the cells to add or remove clues.</Alert>
 
 <Sudoku initCanBacktrack initShowHints />
 
 Most of the time though, the puzzle setter should provide a partially completed grid that has a unique solution, that you can usually find with deduction alone, instead of guessing every possible permutation and check if it is a solution. This puzzle is one such example.
 
-> Turn on **Show Hints** if you don't wish to attempt.
+<Alert severity="info">Turn on [Show Hints] if you don't wish to attempt.</Alert>
 
 <Sudoku
   digits={
@@ -42,13 +42,13 @@ Most of the time though, the puzzle setter should provide a partially completed 
 
 # Sudoku as a CSP
 
-More formally, Sudoku can be viewed as a constraint satisfaction problem (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. This is an example of a 2-SAT,
+More formally, Sudoku can be viewed as a [constraint satisfaction problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. This is an example of a 2-SAT,
 
 ```python
   SAT = lambda x1, x2, x3, x4: (x1 or x2) and (not x1 or x3) and (x2 or not x4)
 ```
 
-in which you need to find an assignment for which `SAT` evaluates to `true` (such as `SAT(1, 0, 1, 0)`). There are known linear time algorithms for 2-SAT. Consider an (implication) graph where the nodes are `x1 = 0, x1 = 1, x2 = 0, x2 = 1, x3 = 0, x3 = 1, x4 = 0, x4 = 1` and the (directed) edges represent implications. For instance, since `x1 = 1 => x3 = 1` in the above example, you can draw an edge from `x1 = 1` to `x3 = 1`. Then if mutually exclusive outcomes (`x1 = 0` and `x1 = 1`) are in the same strongly connected component of the graph, that formula is not satisfiable.
+in which you need to find an assignment for which `SAT` evaluates to `true` (such as `SAT(1, 0, 1, 0)`). There are known linear time algorithms for 2-SAT. Consider an _implication_ graph where the nodes are `x1 = 0`, `x1 = 1`, `x2 = 0`, `x2 = 1`, `x3 = 0`, `x3 = 1`, `x4 = 0`, `x4 = 1` and the _directed_ edges represent implications. For instance, since `x1 = 1 => x3 = 1` in the above example, you can draw an edge from `x1 = 1` to `x3 = 1`. Then if mutually exclusive outcomes (`x1 = 0` and `x1 = 1`) are in the same [strongly connected component](https://en.wikipedia.org/wiki/Strongly_connected_component) of the graph, that formula is not satisfiable.
 
 Before we continue, let us revisit **P** and **NP**:
 
@@ -83,7 +83,7 @@ We can deduce the `5` in _g4_ by observing that no other `5` can reside in the _
 
 On the other hand, consider this puzzle from [Arto Inkala](https://www.linkedin.com/in/arto-inkala-9651485a), which is one of the _hardest_ known Sudoku puzzles that have a _unique_ solution.
 
-> Turn on **Backtracking** to solve the puzzle.
+<Alert severity="info">Turn on [Backtracking] to solve the puzzle.</Alert>
 
 <Sudoku
   digits={
@@ -104,15 +104,17 @@ On the other hand, consider this puzzle from [Arto Inkala](https://www.linkedin.
   initShowHints
 />
 
-In this case, our algorithm has to make a (educated) guess on a cell's value, reject permutations that are not _consistent_ with the new value, and rinse and repeat until no cells are empty, at which point the algorithm terminates with the solution found. However, if there are cells to which we can't assign a _consistent_ value, we have to reject our latest guess and move on to another guess. This brute force algorithm is commonly known as **backtracking**. For maximum efficiency, a Sudoku solver should balance the number of guesses made and the time it takes to check if the guess is _consistent_.
+In this case, our algorithm has to make an _educated_ guess on a cell's value, reject permutations that are not _consistent_ with the new value, and rinse and repeat until no cells are empty, at which point the algorithm returns the solution. However, if there are cells to which we can't assign a _consistent_ value, we have to reject our latest guess and move on to another guess. This brute force algorithm is commonly known as **backtracking**. For maximum efficiency, a Sudoku solver should balance the number of guesses made and the time it takes to check if the guess is _consistent_. That said, how do we define what is _consistent_?
 
 # Local consistency
 
-Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. This is where the notion of _local consistency_ comes into play. Local consistency can be classified as:
+Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. This is where the notion of _local_ and _global consistency_ comes into play.
 
-- _Node consistency_ restricts a variable's domain to which that satisfies unary constraints. See [here](#sudoku-as-a-csp) for an example.
+- _Global consistency_ restricts a variable to values for which a _non-conflicting_ assignment of all variables and constraints _exist_.
 
-- _(generalized) Arc consistency_ restricts a variable's domain to which that a valid assignment _exists_ for a particular constraint. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _d5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
+- _Local consistency_ on the other hand, generally refers to:
+  - _Node consistency_ restricts a variable to values that satisfy unary constraints. See [here](#sudoku-as-a-csp) for an example.
+  - _(generalized) Arc consistency_ restricts a variable to values for which a _non-conflicting_ assignment of all variables for a _particular_ constraint _exists_. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _f5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
 
 <Panel summary="Example">
   <Sudoku
@@ -138,3 +140,57 @@ Judging from how long it takes the algorithm to solve, there is a stark differen
 Notice that if an assignment of variables is _arc-consistent_, that assignment is _node-consistent_ for all variables included in the constraint. _Arc-consistent_ assignments therefore form a subset of _node-consistent_ assignments.
 
 # Implementing the solver
+
+<Alert severity="info">See below for the actual Typescript code.</Alert>
+
+Below is the gist of how this solver enforces arc consistency on `sudoku` (represented as a list of 81 bitmasks representing the 9 digits), given a `queue` of indices (up to 81) to consider, written in a Python-like pseudo-code. For each index in the queue we consider the constraints of its corresponding row, column and block. Looping through each type of constraint, we copy the domains of neighboring variables into `buf` and `prune_buf` it such that what that remains is _arc-consistent_.
+
+- If it cannot be done, the sudoku has no solution and we will backtrack and make another guess if possible.
+- Otherwise, we will consider the cells that have some values in its domain pruned by pushing their indices into `queue` and enforce arc consistency on the constraints they are part of again.
+
+```python
+def enforce_on(sudoku, queue):
+  while queue:
+    front = queue.popleft()
+    for constraint_type in [ROW, COLUMN, BLOCK]:
+      indices = constraint_type.neighboring_indices_of(front)
+      buf = [sudoku[index] for index in indices]
+      pruned_buf = prune_buf(buf)
+      if pruned_buf is None:
+        return False
+      for (index, cell, pruned_cell) in zip(indices, buf, pruned_buf):
+        if cell != pruned_cell:
+          sudoku[index] = pruned_cell
+          queue.push(index)
+  return True
+```
+
+A key observation here is that finding a _arc-consistent_ assignment for [AllDifferent](https://www.ibm.com/docs/en/icos/12.9.0?topic=variables-all-different-constraint) constraints is equivalent to finding a perfect matching in a bipartite graph, consisting of nodes representing the cells and representing the 9 digits, and edges between each cell and the digit(s) it can possibly be. Therefore,`prune_buf` iterates over each cell and fix its `value` to one of those in its domain while leaving the rest of the cells unchanged. Then it tries to find a maximum bipartite matching with algorithms like [Hopcroft-Karp](https://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm). If the matching is not _perfect_, the bit representing `value` is pruned from the corresponding cell in `buf`. Finally, if a cell has no possible values the solution for the sudoku does not exist.
+
+```python
+def prune_buf(buf):
+  pruned_buf = buf.copy() # Cannot modify `buf` in loop
+  for (index, cell) in enumerate(buf):
+    for bit in cell.bits():
+      pruned = buf.copy()
+      pruned[index].unset_all_bits()
+      pruned[index].set(bit)
+      matching = maximum_bipartite_matching(pruned)
+      if matching.cardinality() != 9: # Row/Column size
+        pruned_buf[index].unset(bit)
+    if pruned_buf[index].has_no_bits():
+      return None
+  return pruned_buf
+```
+
+# Addendum
+
+- The core algorithm in this Typescript [implementation](https://github.com/xumarcus/blog/blob/master/components/custom/Sudoku/worker.ts) is under 150 lines since we don't need to code up strategies one by one.
+
+- This Rust [implementation](https://github.com/xumarcus/sudoku) is what this post is based on. It solves Sudokus in 20ms on average on a R5 2600.
+
+- This [t-dillon/tdoku](https://github.com/t-dillon/tdoku) is the fastest implementation I know. The author has some nice benchmarks.
+
+- This [Emerentius/sudoku](https://github.com/Emerentius/sudoku) is a Rust library that is on par with `tdoku`.
+
+- I get my idea from this [Régin, 1994](https://aaai.org/Papers/AAAI/1994/AAAI94-055.pdf). In fact it describes how to shave off another order of magnitude from _Hopcroft-Karp_.

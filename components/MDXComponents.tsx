@@ -5,6 +5,7 @@ import Image from './Image'
 import Pre from './Pre'
 import TOCInline from './TOCInline'
 import * as Custom from './custom'
+import { Alert } from '@mui/material'
 
 const Wrapper: React.FunctionComponent<{ layout: string }> = ({ layout, ...rest }) => {
   const Layout = require(`../layouts/${layout}`).default
@@ -18,7 +19,11 @@ export const MDXComponents: ComponentMap = {
   pre: Pre,
   toc: TOCInline,
   wrapper: Wrapper,
+
   ...Custom,
+
+  // MUI
+  Alert,
 }
 
 interface Props {

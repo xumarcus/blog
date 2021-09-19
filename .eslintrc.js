@@ -30,6 +30,7 @@ module.exports = {
     ],
     'react/prop-types': 0,
     'react/no-unescaped-entities': 0,
+    'no-constant-condition': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-var-requires': 'off',

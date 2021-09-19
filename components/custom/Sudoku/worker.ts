@@ -71,35 +71,11 @@ const toCellValue = (cellConstraints: CellConstraints) => {
   return LOG2P1.get(cellConstraints) ?? null
 }
 
-const enforceOn = (/* mut */ sudoku: Sudoku, index?: number): boolean => {
-  const /* mut */ queue = index !== undefined ? [index] : SPAN // Suboptimal
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const front = queue.shift()
-    if (front === undefined) return true
-    for (const indicesGetter of INDICES_GETTERS) {
-      const indices = indicesGetter(front)
-      if (!enforce(indices, sudoku, queue)) return false
-    }
-  }
-}
-
-const enforce = (
-  indices: number[],
-  /* mut */ sudoku: Sudoku,
-  /* mut */ queue: number[]
-): boolean => {
-  const buf = indices.map((index) => sudoku[index])
-  const prunedBuf = pruneBuf(buf)
-  if (prunedBuf === null) return false
-  for (const [index, [cell, prunedCell]] of R.zip(indices, R.zip(buf, prunedBuf))) {
-    if (cell !== prunedCell) {
-      sudoku[index] = prunedCell
-      queue.push(index)
-    }
-  }
-  return true
+const countSetBits = (x: number) => {
+  x = (x | 0) - ((x >> 1) & 0x55555555)
+  x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
+  x = (x + (x >> 4)) & 0x0f0f0f0f
+  return (x * 0x01010101) >> 24
 }
 
 // Bipartite matching from buf to the domain (1-9)
@@ -144,7 +120,7 @@ const pruneBuf = (buf: CellConstraints[]): CellConstraints[] | null => {
       if (bitmask & cellConstraints) {
         const pruned = R.adjust(index, () => bitmask, buf)
         const matching = bipartiteMatching(pruned)
-        if (matching === null) prunedBuf[index] = cellConstraints & ~bitmask
+        if (matching === null) prunedBuf[index] &= ~bitmask
         hasMatch ||= Boolean(matching)
       }
     }
@@ -153,11 +129,24 @@ const pruneBuf = (buf: CellConstraints[]): CellConstraints[] | null => {
   return prunedBuf
 }
 
-const countSetBits = (x: number) => {
-  x = (x | 0) - ((x >> 1) & 0x55555555)
-  x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
-  x = (x + (x >> 4)) & 0x0f0f0f0f
-  return (x * 0x01010101) >> 24
+const enforceOn = (/* mut */ sudoku: Sudoku, index?: number): boolean => {
+  const /* mut */ queue = index !== undefined ? [index] : SPAN // Should be FIFO queue
+  while (queue.length) {
+    const front = queue.shift() as number
+    for (const getter of INDICES_GETTERS) {
+      const indices = getter(front)
+      const buf = indices.map((index) => sudoku[index])
+      const prunedBuf = pruneBuf(buf)
+      if (prunedBuf === null) return false
+      for (const [index, [cell, prunedCell]] of R.zip(indices, R.zip(buf, prunedBuf))) {
+        if (cell !== prunedCell) {
+          sudoku[index] = prunedCell
+          queue.push(index)
+        }
+      }
+    }
+  }
+  return true
 }
 
 const runBacktrack = (/* ref */ sudoku: Sudoku): Sudoku | null => {

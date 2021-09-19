@@ -75,8 +75,8 @@ const SudokuInner = ({
         if (recvValues.includes(null)) {
           console.assert(!canBacktrack)
           return {
-            type: 'info',
-            body: 'There may be a full solution. Turn on backtracking?',
+            type: 'warning',
+            body: 'Perhaps there is a full solution. Turn on backtracking?',
           }
         }
         if (!didBacktrack) return null
