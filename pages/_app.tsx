@@ -10,10 +10,21 @@ import LayoutWrapper from '@/components/LayoutWrapper'
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material'
 
 const Inner = ({ Component, pageProps }: AppProps) => {
-  const { theme } = useTheme()
+  const { theme, resolvedTheme } = useTheme()
+  const currentTheme = (() => {
+    switch (theme) {
+      case 'light':
+        return 'light'
+      case 'dark':
+        return 'dark'
+      case 'system':
+      default:
+        return resolvedTheme
+    }
+  })()
 
   // Creates new theme per switch to force re-render
-  const themeOptions = theme === 'dark' ? themeOptionsDark : themeOptionsLight
+  const themeOptions = currentTheme === 'dark' ? themeOptionsDark : themeOptionsLight
 
   return (
     <MUIThemeProvider theme={createTheme(themeOptions)}>
