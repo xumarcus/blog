@@ -3,7 +3,7 @@ import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
 import { getFiles } from './mdx'
-import kebabCase from './utils/kebabCase'
+import { kebabCase } from 'lodash'
 
 const root = process.cwd()
 
