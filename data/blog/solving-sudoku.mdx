@@ -1,6 +1,6 @@
 ---
 title: Solving Sudoku
-date: '2021-09-08'
+date: '2021-09-20'
 tags: ['Algorithms']
 draft: false
 summary: Implementing a minimal-guess Sudoku solver
@@ -42,21 +42,12 @@ Most of the time though, the puzzle setter should provide a partially completed 
 
 # Sudoku as a CSP
 
-More formally, Sudoku can be viewed as a [constraint satisfaction problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. This is an example of a 2-SAT,
-
-```python
-  SAT = lambda x1, x2, x3, x4: (x1 or x2) and (not x1 or x3) and (x2 or not x4)
-```
-
-in which you need to find an assignment for which `SAT` evaluates to `true` (such as `SAT(1, 0, 1, 0)`). There are known linear time algorithms for 2-SAT. Consider an _implication_ graph where the nodes are `x1 = 0`, `x1 = 1`, `x2 = 0`, `x2 = 1`, `x3 = 0`, `x3 = 1`, `x4 = 0`, `x4 = 1` and the _directed_ edges represent implications. For instance, since `x1 = 1 => x3 = 1` in the above example, you can draw an edge from `x1 = 1` to `x3 = 1`. Then if mutually exclusive outcomes (`x1 = 0` and `x1 = 1`) are in the same [strongly connected component](https://en.wikipedia.org/wiki/Strongly_connected_component) of the graph, that formula is not satisfiable.
-
-Before we continue, let us revisit **P** and **NP**:
-
+More formally, Sudoku can be viewed as a [constraint satisfaction problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. Interesting CSPs are typically **NP**:
 - If you can _find_ a solution in polynomial time, the problem is said to be in **P**.
 - If you can _verify_ a solution in polynomial time, the problem is said to be in **NP**.
-- Intuitive speaking, you can _find_ a solution to an **NP** problem in _non-deterministic_ polynomial time by _verifying_ all solutions in polynomial time using a _infinitely_ parallel computer.
+- That is to say, you can find a solution to an **NP** problem in _non-deterministic_ polynomial time by _verifying_ all solutions in polynomial time using a _infinitely_ parallel computer.
 
-Unfortunately, while 2-SAT is in **P**, Sudoku is **NP** but not (known to be) **P**, even though most of the time Sudoku clues can imply what values which cell has to be in a similar fashion with 2-SAT. Consider the previous puzzle (with the `7` in _d1_ removed, for sake of brevity),
+For 2-SAT which is **P**, tracing through its implication graph for SCCs suffices. This does not always work for Sudoku puzzles. Consider the previous puzzle (with the `7` in _d1_ removed, for sake of brevity),
 
 <Panel summary="Example">
   <Sudoku
@@ -104,17 +95,15 @@ On the other hand, consider this puzzle from [Arto Inkala](https://www.linkedin.
   initShowHints
 />
 
-In this case, our algorithm has to make an _educated_ guess on a cell's value, reject permutations that are not _consistent_ with the new value, and rinse and repeat until no cells are empty, at which point the algorithm returns the solution. However, if there are cells to which we can't assign a _consistent_ value, we have to reject our latest guess and move on to another guess. This brute force algorithm is commonly known as **backtracking**. For maximum efficiency, a Sudoku solver should balance the number of guesses made and the time it takes to check if the guess is _consistent_. That said, how do we define what is _consistent_?
+In this case, our algorithm has to **backtrack**, i.e., make an _educated_ guess on a cell's value, reject permutations that are not _consistent_ with the new value, and rinse and repeat until no cells are empty, at which point the algorithm returns the solution, or reject our latest guess and move on to another guess. A Sudoku solver should balance the number of guesses made and the time it takes to check if the guess is locally _consistent_.
 
 # Local consistency
 
-Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. This is where the notion of _local_ and _global consistency_ comes into play.
-
-- _Global consistency_ restricts a variable to values for which a _non-conflicting_ assignment of all variables and constraints _exist_.
-
-- _Local consistency_ on the other hand, generally refers to:
-  - _Node consistency_ restricts a variable to values that satisfy unary constraints. See [here](#sudoku-as-a-csp) for an example.
-  - _(generalized) Arc consistency_ restricts a variable to values for which a _non-conflicting_ assignment of all variables for a _particular_ constraint _exists_. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _f5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
+Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. While finding a _globally consistent_ solution takes time (one that restricts a variable to values for which a _non-conflicting_ assignment of all variables and constraints _exist_), we can enforce _locally consistent_ conditions to reduce the search space. In ascending order of complexity the conditions are grouped as:
+  - Node consistency restricts a variable to values that satisfy unary constraints. See [here](#sudoku-as-a-csp) for an example.
+  - Arc consistency restricts a pair of variables to the pairs of values that satisfy binary constraints.
+  - Path consistency restricts a triplet of variables to the triplets of values that satisfy binary constraints pairwisely.
+  - Generalized _n_-consistency restricts a _n_-let of variables to the _n_-lets of values that satisfy **_n_-ary** constraints. Each variable is restricted to values for which a _non-conflicting_ assignment of all variables for a _particular_ constraint _exists_. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _f5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
 
 <Panel summary="Example">
   <Sudoku
@@ -137,13 +126,13 @@ Judging from how long it takes the algorithm to solve, there is a stark differen
   />
 </Panel>
 
-Notice that if an assignment of variables is _arc-consistent_, that assignment is _node-consistent_ for all variables included in the constraint. _Arc-consistent_ assignments therefore form a subset of _node-consistent_ assignments.
+Enforcing conditions take exponentially (in _n_) more time. Usually, node or arc consistency yields the best result. This solver is therefore far from optimal in terms of speed, but solves most puzzles without backtracking.
 
 # Implementing the solver
 
 <Alert severity="info">See below for the actual Typescript code.</Alert>
 
-Below is the gist of how this solver enforces arc consistency on `sudoku` (represented as a list of 81 bitmasks representing the 9 digits), given a `queue` of indices (up to 81) to consider, written in a Python-like pseudo-code. For each index in the queue we consider the constraints of its corresponding row, column and block. Looping through each type of constraint, we copy the domains of neighboring variables into `buf` and `prune_buf` it such that what that remains is _arc-consistent_.
+The canonical algorithm for enforcing arc consistency is AC-3. The following pseudocode acts on `sudoku` (represented as a list of 81 bitmasks representing the 9 digits), given a `queue` of indices (up to 81) to consider. For each index in the queue we consider the constraints of its corresponding row, column and block. Looping through each type of constraint, we copy the domains of neighboring variables into `buf` and `prune_buf` it such that what that remains is _arc-consistent_.
 
 - If it cannot be done, the sudoku has no solution and we will backtrack and make another guess if possible.
 - Otherwise, we will consider the cells that have some values in its domain pruned by pushing their indices into `queue` and enforce arc consistency on the constraints they are part of again.
@@ -185,12 +174,12 @@ def prune_buf(buf):
 
 # Addendum
 
-- The core algorithm in this Typescript [implementation](https://github.com/xumarcus/blog/blob/master/components/custom/Sudoku/worker.ts) is under 150 lines since we don't need to code up strategies one by one.
+- Typescript [implementation](https://github.com/xumarcus/blog/blob/master/components/custom/Sudoku/worker.ts)
 
-- This Rust [implementation](https://github.com/xumarcus/sudoku) is what this post is based on. It solves Sudokus in 20ms on average on a R5 2600.
+- Rust [implementation](https://github.com/xumarcus/sudoku). It solves Sudokus in 20ms on average on a R5 2600.
 
 - This [t-dillon/tdoku](https://github.com/t-dillon/tdoku) is the fastest implementation I know. The author has some nice benchmarks.
 
 - This [Emerentius/sudoku](https://github.com/Emerentius/sudoku) is a Rust library that is on par with `tdoku`.
 
-- I get my idea from this [Régin, 1994](https://aaai.org/Papers/AAAI/1994/AAAI94-055.pdf). In fact it describes how to shave off another order of magnitude from _Hopcroft-Karp_.
+- Ideas from [Régin, 1994](https://aaai.org/Papers/AAAI/1994/AAAI94-055.pdf). In fact it describes how to shave off another order of magnitude from _Hopcroft-Karp_.
