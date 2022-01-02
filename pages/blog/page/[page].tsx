@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { PageSEO } from '@/components/SEO'
 import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesFrontMatter } from '@/lib/mdx'
@@ -25,11 +24,8 @@ export const getStaticProps: GetStaticProps<{
   initialDisplayPosts: PostFrontMatter[]
   pagination: { currentPage: number; totalPages: number }
 }> = async (context) => {
-  const {
-    params: { page },
-  } = context
   const posts = await getAllFilesFrontMatter('blog')
-  const pageNumber = parseInt(page as string)
+  const pageNumber = parseInt(context?.params?.page as string)
   const initialDisplayPosts = posts.slice(
     POSTS_PER_PAGE * (pageNumber - 1),
     POSTS_PER_PAGE * pageNumber
