@@ -17,6 +17,7 @@
 
 import CellGrid from './CellGrid'
 import Panel from './Panel'
+import SimpleBarChart from './SimpleBarChart'
 import SimpleLineChart from './SimpleLineChart'
 import Sudoku from './Sudoku'
-export { CellGrid, Panel, SimpleLineChart, Sudoku }
+export { CellGrid, Panel, SimpleBarChart, SimpleLineChart, Sudoku }
