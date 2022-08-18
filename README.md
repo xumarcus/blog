@@ -19,14 +19,12 @@
 
 ## Overview
 
-This borrows template from [timrlx](https://github.com/timlrx) with type checking fixed. My personal projects are included as well.
-
-## Local
-
-```bash
-npm start
-```
+This borrows template from [timrlx](https://github.com/timlrx) with type checking fixed. My personal projects are included as well. Run with `npm run start`. Hosted at https://marcusxu.com
 
 ## License
 
 This repo is licensed under [GPL](https://github.com/xumarcus/blog/blob/master/LICENSE) © Marcus Xu, except for the template which is licensed under [MIT](https://github.com/timlrx/tailwind-nextjs-starter-blog/blob/master/LICENSE) © [Timothy Lin](https://www.timrlx.com).
+
+## Notes
+
+Please disable Markdown inspection for IDEA for unresolved file reference, since JetBrains annoyingly does not recognize NextJS structure for Markdown and there is no way to configure (even Mark as Resource Root).
