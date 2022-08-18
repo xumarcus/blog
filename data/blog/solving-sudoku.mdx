@@ -18,13 +18,10 @@ With insufficient clues, multiple solutions can exist. As an extreme example, th
 
 <Sudoku initCanBacktrack initShowHints />
 
-Most of the time though, the puzzle setter should provide a partially completed grid that has a unique solution, that you can usually find with deduction alone, instead of guessing every possible permutation and check if it is a solution. This puzzle is one such example.
-
 <Alert severity="info">Turn on [Show Hints] if you don't wish to attempt.</Alert>
 
 <Sudoku
   digits={
-    //
     // prettier-ignore
     [
       0, 0, 0, 7, 0, 0, 0, 0, 0,
@@ -40,14 +37,7 @@ Most of the time though, the puzzle setter should provide a partially completed 
   }
 />
 
-# Sudoku as a CSP
-
-More formally, Sudoku can be viewed as a [constraint satisfaction problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP), where one needs to find a state that satisfies a number of constraints. Other examples of CSPs are 2-SAT, 3-SAT, 8-Queens and 15-Puzzles. Interesting CSPs are typically **NP**:
-- If you can _find_ a solution in polynomial time, the problem is said to be in **P**.
-- If you can _verify_ a solution in polynomial time, the problem is said to be in **NP**.
-- That is to say, you can find a solution to an **NP** problem in _non-deterministic_ polynomial time by _verifying_ all solutions in polynomial time using a _infinitely_ parallel computer.
-
-For 2-SAT which is **P**, tracing through its implication graph for SCCs suffices. This does not always work for Sudoku puzzles. Consider the previous puzzle (with the `7` in _d1_ removed, for sake of brevity),
+Sudoku is a [constraint satisfaction problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP). Sometimes solution can be deduced without repeated tries. Consider the previous puzzle (with the `7` in _d1_ removed, for sake of brevity),
 
 <Panel summary="Example">
   <Sudoku
@@ -99,11 +89,11 @@ In this case, our algorithm has to **backtrack**, i.e., make an _educated_ guess
 
 # Local consistency
 
-Judging from how long it takes the algorithm to solve, there is a stark difference in difficulty between deducing `g4 = 5` in the first puzzle and `g6 = 5` in the second. While finding a _globally consistent_ solution takes time (one that restricts a variable to values for which a _non-conflicting_ assignment of all variables and constraints _exist_), we can enforce _locally consistent_ conditions to reduce the search space. In ascending order of complexity the conditions are grouped as:
-  - Node consistency restricts a variable to values that satisfy unary constraints. See [here](#sudoku-as-a-csp) for an example.
-  - Arc consistency restricts a pair of variables to the pairs of values that satisfy binary constraints.
-  - Path consistency restricts a triplet of variables to the triplets of values that satisfy binary constraints pairwisely.
-  - Generalized _n_-consistency restricts a _n_-let of variables to the _n_-lets of values that satisfy **_n_-ary** constraints. Each variable is restricted to values for which a _non-conflicting_ assignment of all variables for a _particular_ constraint _exists_. For instance in the example below we can deduce the `5` in _d4_ by observing that _e4_ and _f5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
+Judging from how long it takes the algorithm to solve, deducing `g4 = 5` in the first puzzle is easier than deducing `g6 = 5` in the second. While finding a _globally consistent_ solution takes time, we can prune the search space by considering _locally consistent_ conditions.
+  - Node consistency: Constrain a node. See [here](#sudoku-as-a-csp) for an example.
+  - Arc consistency: Constrain a pair.
+  - Path consistency: Constrain a triple, where each pair satisfies binary constraints.
+  - Generalized _n_-consistency: Constrain a _n_-let of variables to the _n_-lets of values that satisfy **_n_-ary** constraints. For example, we can deduce the `5` in _d4_ by observing that _e4_ and _f5_ form a [naked pair](http://hodoku.sourceforge.net/en/tech_naked.php), such that we cannot assign `8` and `9` to other cells in their block including _d4_.
 
 <Panel summary="Example">
   <Sudoku
@@ -126,7 +116,7 @@ Judging from how long it takes the algorithm to solve, there is a stark differen
   />
 </Panel>
 
-Enforcing conditions take exponentially (in _n_) more time. Usually, node or arc consistency yields the best result. This solver is therefore far from optimal in terms of speed, but solves most puzzles without backtracking.
+There is a trade-off between complex conditions and simple conditions, since complex conditions reduce the number of tries but is computationally expensive. Usually, node or arc consistency yields the best result. This solver is therefore far from optimal in terms of speed, but solves most puzzles without backtracking.
 
 # Implementing the solver
 
@@ -134,7 +124,9 @@ Enforcing conditions take exponentially (in _n_) more time. Usually, node or arc
 
 The canonical algorithm for enforcing arc consistency is AC-3. The following pseudocode acts on `sudoku` (represented as a list of 81 bitmasks representing the 9 digits), given a `queue` of indices (up to 81) to consider. For each index in the queue we consider the constraints of its corresponding row, column and block. Looping through each type of constraint, we copy the domains of neighboring variables into `buf` and `prune_buf` it such that what that remains is _arc-consistent_.
 
-- If it cannot be done, the sudoku has no solution and we will backtrack and make another guess if possible.
+- If it cannot be done, the sudoku has no solution.
+- Then we will backtrack and make another guess if possible.
+  - Most solvers will record the modifications with a stack and undo them when they backtrack, but our solver seldom backtracks, so we may as well copy the entire puzzle. It's also convenient for parallelism.
 - Otherwise, we will consider the cells that have some values in its domain pruned by pushing their indices into `queue` and enforce arc consistency on the constraints they are part of again.
 
 ```python
@@ -171,6 +163,8 @@ def prune_buf(buf):
       return None
   return pruned_buf
 ```
+
+While this approach is academically interesting, the standard approach on Sudoku is usually faster. This is probably due to overhead from enforcing complex conditions. However, this might change if the puzzle is larger (say, 16x16) such that parallelism overhead is comparatively low.
 
 # Addendum
 
