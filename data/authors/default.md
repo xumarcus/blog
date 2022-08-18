@@ -18,11 +18,11 @@ Strikethrough modules are not counted towards CAP or graduation progress. See [U
 
 Math
 - MA1100T Basic Discrete Mathematics (T)
-- MA2001 Linear Algebra I
+- [MA2001 Linear Algebra I](/blog/ma2001)
 - [MA2002 Calculus](/blog/ma2002)
-- MA2101S Mathematical Analysis I (S)
+- MA2101S Linear Algebra II
 - MA2104 Multivariate Calculus
-- MA2108S Linear Algebra II
+- MA2108S Mathematical Analysis I (S)
 
 CS
 - CS1101S Programming Methodology I (Exempted)
